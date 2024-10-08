@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class DynamicAI_System : ModuleRules
+public class DynamicAI_SystemEditor : ModuleRules
 {
-	public DynamicAI_System(ReadOnlyTargetRules Target) : base(Target)
+	public DynamicAI_SystemEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
