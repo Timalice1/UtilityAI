@@ -1,30 +1,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTags.h"
 #include "Scorer.generated.h"
 
-UCLASS(MinimalAPI, BlueprintType, Abstract, Blueprintable,
-       DisplayName = "UtilityScorer")
-class UScorerObject : public UObject
+UCLASS(MinimalAPI, BlueprintType)
+class UConsideration : public UObject
 {
     GENERATED_BODY()
 
-protected:
-    UPROPERTY(EditAnywhere)
-    FRuntimeFloatCurve ResponseCurve;
-
-    float ScorerValue = .0f;
+private:
+    float _value = 0.f;
+    FRichCurve _responseCurve;
 
 public:
-    UScorerObject() {};
+    UConsideration() {};
 
-    virtual void SetValue(float NewValue) { ScorerValue = NewValue; }
-
-    virtual float GetScore()
+    virtual void SetResponseCurve(FRichCurve inCurve)
     {
-        float score = ResponseCurve.GetRichCurve()->Eval(ScorerValue);
-        score = FMath::Clamp(score, 0, 1);
-        return score;
+        _responseCurve = inCurve;
+    }
+
+    virtual void SetValue(float NewValue)
+    {
+        _value = NewValue;
+    }
+
+    virtual float GetRawScore()
+    {
+        if (!_responseCurve.IsEmpty())
+            return _responseCurve.Eval(_value);
+        return 0.f;
     }
 };
 
@@ -40,32 +46,62 @@ struct FScorer
 {
     GENERATED_BODY()
 
-private:
-    TObjectPtr<UScorerObject> ScorerInstance;
+protected:
+    UPROPERTY()
+    TObjectPtr<UConsideration> _considerationInstance;
 
 public:
-    UPROPERTY(VisibleInstanceOnly, Transient)
+    UPROPERTY(VisibleInstanceOnly)
     bool FirstElement = false;
 
+    /** Make sure that actions comes in the right order
+     * Scorers with OR operator need to be on the top o action scorers array,
+     * and scorers with operator AND goes next */
     UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "!FirstElement", EditConditionHides))
     TEnumAsByte<EOperator> Operator;
 
+    /** Returns (1-x) value */
     UPROPERTY(EditDefaultsOnly)
-    bool Inverted;
+    bool Inverted = false;
 
+    /** Scorer implementation class */
     UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<UScorerObject> ScorerClass;
+    FGameplayTag ScorerTag;
 
-    void SetScorerInstance(TObjectPtr<UScorerObject> NewScorer) { ScorerInstance = NewScorer; };
+    /** Weight of this consideration for current action */
+    UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 0.1))
+    float Weight = 1.f;
 
-    TObjectPtr<UScorerObject> GetScorerInstance() { return ScorerInstance; }
-
-    float GetScore()
+    FORCEINLINE virtual void SetConsiderationInstance(TObjectPtr<UConsideration> inInstance)
     {
-        if (ScorerInstance)
-            return Inverted ? 1 - ScorerInstance->GetScore() : ScorerInstance->GetScore();
+        _considerationInstance = inInstance;
+        UE_CLOG(_considerationInstance != nullptr, LogTemp, Log, TEXT("Instance [%s] created"), *_considerationInstance->GetName());
+    }
+
+    FORCEINLINE virtual TObjectPtr<UConsideration> GetConsiderationInstance() { return _considerationInstance; }
+
+    FORCEINLINE virtual float GetRawScore() {
+        if (IsValid(_considerationInstance))
+            return _considerationInstance->GetRawScore();
         return 0.f;
     }
 
-    friend uint32 GetTypeHash(const FScorer &scorer) { return GetTypeHash(scorer.ScorerClass); }
+    virtual float GetScore()
+    {
+        if (_considerationInstance != nullptr)
+        {
+            float rawScore = _considerationInstance->GetRawScore();
+            rawScore = Inverted ? 1 - rawScore : rawScore;
+            rawScore *= Weight;
+            return rawScore;
+        }
+        return 0.f;
+    }
+
+    friend bool operator==(const FScorer &This, const FScorer &Other)
+    {
+        return This.ScorerTag == Other.ScorerTag;
+    }
+
+    friend uint32 GetTypeHash(const FScorer &scorer) { return GetTypeHash(scorer.ScorerTag); }
 };

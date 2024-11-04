@@ -38,6 +38,11 @@ public class DynamicAI_SystemEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"DynamicAI_System",
+				"AssetTools",
+				"UnrealEd",
+				"PropertyEditor",
+				"Projects"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

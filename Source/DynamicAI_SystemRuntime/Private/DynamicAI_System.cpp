@@ -21,7 +21,7 @@ void FDynamicAI_SystemModule::StartupModule()
 		EGameplayDebuggerCategoryState::EnabledInGameAndSimulate,
 		6);
 	GameplayDebuggerModule.NotifyCategoriesChanged();
-#endif
+#endif //WITH_GAMEPLAY_DEBUGGER
 }
 
 void FDynamicAI_SystemModule::ShutdownModule()

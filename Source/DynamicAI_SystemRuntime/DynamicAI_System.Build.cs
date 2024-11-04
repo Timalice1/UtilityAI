@@ -29,7 +29,8 @@ public class DynamicAI_System : ModuleRules
 				"AIModule",
 				"NavigationSystem",
 				"GameplayTasks",
-				"GameplayDebugger"
+				"GameplayDebugger",
+				"GameplayTags"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

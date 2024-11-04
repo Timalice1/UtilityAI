@@ -7,7 +7,7 @@
 class APlayerController;
 class AActor;
 class UAction;
-class UUtilityManeger;
+class UUtilityManager;
 
 class FGameplayDebuggerCategory_UtilityAI : public FGameplayDebuggerCategory
 {
@@ -27,9 +27,11 @@ protected:
         FString ControllerName;
         FString ActorName;
         FString UtilityManager;
-        FString CurrentAction;
-        float CurrentActionScore;
-        TArray<FString> AllActions;
+
+        TArray<UAction*> ActiveActions;
+        TArray<struct FActionsPool> Pools;
+        TArray<struct FScorer> Scorers;
+
         void Serialize(FArchive &ar);
     };
 

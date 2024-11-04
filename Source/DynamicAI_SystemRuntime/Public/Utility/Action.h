@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Scorer.h"
+#include "GameplayTags.h"
+#include "CoreMinimal.h"
 #include "Action.generated.h"
 
 UENUM(BlueprintType)
@@ -8,27 +9,53 @@ enum EScoreType : uint8
 {
     EST_Constant UMETA(DisplayName = "Constant"),
     EST_Evaluated UMETA(DisplayName = "Evaluated")
+    // EST_Blackboard
 };
 
 class AAIController;
 class APawn;
+class UService;
+class UUtilityManager;
+class UConsideration;
+struct FScorer;
 
-UCLASS(MinimalAPI, BlueprintType, Abstract, EditInlineNew,
-       DisplayName = "Utility Action")
+UCLASS(MinimalAPI,
+       BlueprintType,
+       Blueprintable,
+       Abstract,
+       DefaultToInstanced,
+       EditInlineNew,
+       DisplayName = "UtilityAction")
 class UAction : public UObject
 {
     GENERATED_BODY()
 
-    TObjectPtr<AAIController> controller;
-    TObjectPtr<APawn> pawn;
 
     float ActionScore = 0.f;
 
-protected:
-    /**Define action score type.
-     * Constant if action return constant score and evaluated if score needs to be calculated
-     * using linked scorers*/
-    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig", meta = (EditInline = false))
+private:
+    virtual UWorld *GetWorld() const override;
+
+#if WITH_EDITOR
+    virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
+#endif
+
+public:
+    UPROPERTY(BlueprintReadOnly, Category = "UtilityAI|Action")
+    TObjectPtr<AAIController> _controller;
+    UPROPERTY(BlueprintReadOnly, Category = "UtilityAI|Action")
+    TObjectPtr<APawn> _pawn;
+    UPROPERTY(BlueprintReadOnly, Category = "UtilityAI|Action")
+    TObjectPtr<UUtilityManager> _manager;
+
+    /** Set this to true if action can be run in parallel with others*/
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
+    bool bCanRunConcurent = false;
+
+    UPROPERTY(EditAnywhere, Category = "ActionConfig", meta = (ClampMin = 0.01f))
+    float ActionPriority = 1;
+
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
     TEnumAsByte<EScoreType> ScoreType;
 
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig",
@@ -43,6 +70,9 @@ protected:
                       EditInline = false))
     TArray<FScorer> Scorers;
 
+    UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action", BlueprintPure)
+    UUtilityManager *GetUtilityManager() { return _manager; }
+
     /** Provides action implementation */
     UFUNCTION(BlueprintImplementableEvent, Category = "UtilityAI|Action")
     void ExecuteAction(AAIController *Controller, APawn *Pawn);
@@ -52,39 +82,30 @@ protected:
     void OnActionFinished(AAIController *Controller, APawn *Pawn);
 
     /** Needs to be called when action is about to finish */
-    UFUNCTION(BlueprintCallable, Category = "UtilityAi|Action")
-    void FinishExecute() { OnActionFinished(controller, pawn); }
+    UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
+    void FinishExecute();
 
 public:
-    UAction() {};
+    bool IsFinished = true;
 
-    void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override {
-        FName property = PropertyChangedEvent.GetPropertyName();
-        if(property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty()) {
-            Scorers[0].FirstElement = true;
-            for(int i = 1; i<Scorers.Num(); i++)
-                Scorers[i].FirstElement = false;
-        }
-        Modify();
-    };
-
-    virtual UWorld *GetWorld() const override;
+    UAction(){};
 
     /** Initialize action */
-    virtual void Init(AAIController *InController, APawn *InPawn);
+    virtual void Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TObjectPtr<UConsideration>> InConsiderations);
 
     /** Calculate action score based on score type and linked scorers */
     virtual float EvaluateActionScore();
 
     /** Call's action implementation */
-    virtual void Execute()
-    {
-        if (controller && pawn)
-            this->ExecuteAction(controller, pawn);
-    }
+    virtual void Execute();
 
     virtual float GetActionScore() const { return ActionScore; }
 
-    /** @return all linked scorers instances */
-    virtual TArray<TObjectPtr<UScorerObject>> GetScorers();
+    virtual bool CanRunConcurrentlyWith(UAction* OtherAction) const
+    {
+        return bCanRunConcurent && OtherAction->bCanRunConcurent;
+    }
+
+    /** @return all scorers tags related to this action*/
+    virtual TArray<FScorer> GetScorers() { return Scorers; };
 };
