@@ -66,8 +66,11 @@ void UUtilityManager::Deactivate()
 {
     GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 
-    for (UService *_service : Services)
-        GetWorld()->GetTimerManager().ClearAllTimersForObject(_service);
+    for (UService *_service : Services){
+        GetWorld()->GetTimerManager().ClearTimer(_service->tickTimer);
+        _service = nullptr;
+        _service->ConditionalBeginDestroy();
+    }
 
     Services.Empty();
 
@@ -170,6 +173,12 @@ bool UUtilityManager::CanRunConcurent(UAction *Action) const
 
 void UUtilityManager::SetScorerValue(FGameplayTag InScorerTag, float InValue)
 {
+    if(AController* controller = Cast<AController>(GetOwner()))
+    {
+        if(!controller->GetPawn())
+            return;
+    }
+
     if (_considerations.IsEmpty())
     {
         UE_LOG(UtilityManagerLog, Warning, TEXT("UtilityManager::SetScorerValue(%s) - no one scorer is defined."),

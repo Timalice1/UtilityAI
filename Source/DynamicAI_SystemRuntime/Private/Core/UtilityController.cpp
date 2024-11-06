@@ -12,6 +12,7 @@
 #include "Perception/AISense_Touch.h"
 #include "Perception/AISense_Team.h"
 #include "Perception/AISense_Blueprint.h"
+#include "Core/BaseCharacter.h"
 
 AUtilityController::AUtilityController()
 {
@@ -44,22 +45,22 @@ ETeamAttitude::Type AUtilityController::GetTeamAttitudeTowards(const AActor &Oth
     if (!_otherPawn) /* If perceived actor is not a pawn, mark this actor as neutral*/
         return ETeamAttitude::Neutral;
 
-    const IGenericTeamAgentInterface * _playerTeamInterface = Cast<IGenericTeamAgentInterface>(_otherPawn);
+    const IGenericTeamAgentInterface *_playerTeamInterface = Cast<IGenericTeamAgentInterface>(_otherPawn);
     const IGenericTeamAgentInterface *_aiTeamInterface = Cast<IGenericTeamAgentInterface>(_otherPawn->GetController());
-    if(!_playerTeamInterface && !_aiTeamInterface)
+    if (!_playerTeamInterface && !_aiTeamInterface)
         return ETeamAttitude::Neutral;
 
     FGenericTeamId _otherActorTeamId = NULL;
-    if(_aiTeamInterface) 
+    if (_aiTeamInterface)
         _otherActorTeamId = _aiTeamInterface->GetGenericTeamId();
-    else if(_playerTeamInterface) 
+    else if (_playerTeamInterface)
         _otherActorTeamId = _playerTeamInterface->GetGenericTeamId();
 
     /*Compare this character team id with other actor team id*/
     FGenericTeamId _thisTeamId = GetGenericTeamId();
-    if(_thisTeamId == _otherActorTeamId)
+    if (_thisTeamId == _otherActorTeamId)
         return ETeamAttitude::Friendly;
-    if(_otherActorTeamId == 255)
+    if (_otherActorTeamId == 255)
         return ETeamAttitude::Neutral;
 
     return ETeamAttitude::Hostile;
@@ -67,8 +68,57 @@ ETeamAttitude::Type AUtilityController::GetTeamAttitudeTowards(const AActor &Oth
 
 TEnumAsByte<ESenseType> AUtilityController::CheckSenseType(const FAIStimulus &stimulus) const
 {
-    TSubclassOf<UAISense> sense = UAIPerceptionSystem::GetSenseClassForStimulus(GetWorld(), stimulus); 
-    if(_senses.Contains(sense))
+    TSubclassOf<UAISense> sense = UAIPerceptionSystem::GetSenseClassForStimulus(GetWorld(), stimulus);
+    if (_senses.Contains(sense))
         return *_senses.Find(sense);
     return TEnumAsByte<ESenseType>();
+}
+
+FVector AUtilityController::GetFocalPointOnActor(const AActor *Actor) const
+{
+    FVector _focalPoint = FAISystem::InvalidLocation;
+
+    if (Actor != nullptr)
+    {
+        _focalPoint = Actor->GetActorLocation();
+        auto _char = Cast<ABaseCharacter>(Actor);
+        if (_char)
+            _focalPoint =
+                _char->GetActorLocation() +
+                (FVector(0, 0, 1) * _char->GetMesh()->GetSocketTransform(_char->GetTargetBone(), RTS_Actor).GetTranslation());
+    }
+    return _focalPoint;
+}
+
+void AUtilityController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
+{
+    APawn *const MyPawn = GetPawn();
+    if (MyPawn)
+    {
+        FRotator NewControlRotation = GetControlRotation();
+
+        // Look toward focus
+        const FVector FocalPoint = GetFocalPoint();
+        if (FAISystem::IsValidLocation(FocalPoint))
+        {
+            NewControlRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).Rotation();
+        }
+
+        else if (bSetControlRotationFromPawnOrientation)
+        {
+            NewControlRotation = MyPawn->GetActorRotation();
+        }
+
+        SetControlRotation(NewControlRotation);
+
+        if (bUpdatePawn)
+        {
+            const FRotator CurrentPawnRotation = MyPawn->GetActorRotation();
+
+            if (CurrentPawnRotation.Equals(NewControlRotation, 1e-3f) == false)
+            {
+                MyPawn->FaceRotation(NewControlRotation, DeltaTime);
+            }
+        }
+    }
 }

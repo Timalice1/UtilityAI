@@ -4,6 +4,37 @@
 #include "GameplayTags.h"
 #include "UtilityManager.generated.h"
 
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⣠⣄⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⣿⣿⣷⣄⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠙⢿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢀⢸⣿⣿⣿⣿⣷⣦⡈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⣁⣴⣾⡇⠀⢸⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠸⢸⣿⣿⣿⣿⣿⣿⣿⣦⡈⠹⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⢁⣤⣾⣿⣿⣿⠀⠃⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⢰⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⢁⣤⣾⣿⣿⣿⣿⣿⠇⢀⠀⣽⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠸⠀⣿⣿⣿⣿⣿⣉⣉⣉⣉⣉⣉⣀⣈⣉⣉⣛⠛⠛⠿⠿⢿⡿⠛⢁⣤⣾⣿⣿⣿⣿⣿⣿⣿⡟⠀⡜⢠⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⠂⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⢈⠇⣸⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⡜⢀⣾⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠃⣼⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⣸⣿⠿⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⢰⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠀⠀⢁⣤⣶⠶⠂⠀⠉⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⣉⣤⡤⠀⠀⠈⠉⠛⠿⣿⣿⣿⣿⣿⣿⡇⠀⢿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⡏⠁⣤⡶⠊⢠⠼⠛⠉⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⣿⣿⠟⠁⣰⠞⠋⠁⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⣿⡷⢆⠸⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣦⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⠿⠏⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣉⣩⣍⣁⠀⠀⠙⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⠟⠋⢁⣴⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣿⣿⣿⣿⣿⣷⣦⡀⠻⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⠀⢤⣶⣾⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡈⠻⣿⣿⣿⣿⣿
+// ⣿⣿⠁⠈⠙⠿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⠘⣿⣿⣿⣿
+// ⣿⢿⣷⣄⡀⠀⠀⠈⣹⣿⣦⣄⣀⠀⠀⢀⡀⠀⣴⣿⣿⣿⠋⣸⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⢹⣿⣿
+// ⣿⣄⠠⣤⣤⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣀⠀⠹⠿⠟⠃⡀⠘⣿⣿⣿⡿⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀⣀⠤⣆⠑⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠈⣿
+// ⣿⣿⣷⣄⡙⠛⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣤⡖⣀⣄⠐⡄⠈⠉⠀⢀⣴⣿⣿⣿⣶⣶⣶⣶⣾⣿⠯⠒⠁⢀⣴⡄⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⡿⠏⠀⠄⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⢀⣤⠲⣞⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢠
+// ⣿⣿⣿⣤⠀⠀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⢁⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢀⣾
+// ⣿⣿⣿⡯⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⣠⣿⣿
+// ⣿⣿⣿⠃⠀⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢁⣼⣿⣿⣿
+// ⣿⣿⣿⠇⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠉⢠⣿⣿⣿⣿⣿
+// ⣿⣿⠏⠀⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁⣤⣿⣿⣿⣿⣿⣿
+// ⡟⠁⡀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⢰⣿⣿⣿⣿⣿⣿⣿
+// ⣿⠏⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠉⠀⣿⣿⣿⣿⣿⣿⣿⣿
+// ⠁⡀⠁⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣤⣿⣿⣿⣿⣿⣿⣿⣿
+// ⡿⠁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿
+
 class UAction;
 
 USTRUCT(BlueprintType)
@@ -64,46 +95,44 @@ class DYNAMICAI_SYSTEM_API UUtilityManager : public UActorComponent
     FTimerHandle executeActionTimer;
 
     TMap<FGameplayTag, TObjectPtr<UConsideration>> _considerations;
-    TMap<UAction*, 
-        TMap<FGameplayTag, TObjectPtr<UConsideration>>> _actionsScorers;
-
+    TMap<UAction *,
+         TMap<FGameplayTag, TObjectPtr<UConsideration>>>
+        _actionsScorers;
 
     TArray<FActionsPool> _pools;
     TArray<TObjectPtr<UAction>> _actions;
 
-    TArray<UAction*> _activeActions;
+    TArray<UAction *> _activeActions;
 
 private:
-
     virtual void PostReinitProperties() override;
 
     /** @return false if there is no pools provided or pools is empty */
-    virtual bool IsEmpty() ;
+    virtual bool IsEmpty();
 
-    virtual void Activate(bool bReset=false) override;
+    virtual void Activate(bool bReset = false) override;
     virtual void Deactivate() override;
 
     /** Initialize all privided actions and their scorers */
-    virtual void InitPools() ;
-    virtual bool InitScorers() ;
+    virtual void InitPools();
+    virtual bool InitScorers();
 
-    /** 
-     * Scoring each action from each pool, and execute action with best utility score. 
-     * Add selected action from the pool to active actions array is action can be executing 
+    /**
+     * Scoring each action from each pool, and execute action with best utility score.
+     * Add selected action from the pool to active actions array is action can be executing
      * concurently with other actions
-    */
+     */
     virtual void EvaluateActions();
 
-
     /** Check if given action can run concurently with all of active actions */
-    virtual bool CanRunConcurent(UAction* Action) const ;
+    virtual bool CanRunConcurent(UAction *Action) const;
 
 private:
 #if WITH_EDITOR
-    virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override ;
-    virtual void UpdateCurveTableRows() ;
-    virtual void CreateCurve(FName Name) ;
-    virtual void ResetConsiderations() ;
+    virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
+    virtual void UpdateCurveTableRows();
+    virtual void CreateCurve(FName Name);
+    virtual void ResetConsiderations();
 #endif // WITH_EDITOR
 
 public:
@@ -119,8 +148,8 @@ public:
     virtual TArray<TObjectPtr<UAction>> GetActions() const { return _actions; }
 
     /** @return an array of all currently active actions */
-    virtual TArray<UAction*> GetActiveActions() {return _activeActions; }
-    virtual TArray<UAction*> GetActiveActions() const { return _activeActions; }
+    virtual TArray<UAction *> GetActiveActions() { return _activeActions; }
+    virtual TArray<UAction *> GetActiveActions() const { return _activeActions; }
 
 protected:
     /** How often actions utilities needs to be updated */
@@ -132,7 +161,7 @@ protected:
     TObjectPtr<class UCurveTable> ScorersCurveTable = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "UtilityManager|Evaluator")
-    TSet<class UService*> Services;
+    TSet<class UService *> Services;
 
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Actions")
     TSet<FActionsPool> ActionsPools;
@@ -145,8 +174,8 @@ public:
 
     /** Set value for each scorer by tags in container to 0 */
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
-    void ResetScorers(FGameplayTagContainer InScorersTags); 
-    
+    void ResetScorers(FGameplayTagContainer InScorersTags);
+
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
-    void AbortActiveActions(); 
+    void AbortActiveActions();
 };

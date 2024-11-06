@@ -5,8 +5,6 @@
 #include "GenericTeamAgentInterface.h"
 #include "BaseCharacter.generated.h"
 
-
-
 UCLASS()
 class ABaseCharacter : public ACharacter,
                        public IAISightTargetInterface,
@@ -35,6 +33,8 @@ public:
 public:
     UPROPERTY(EditAnywhere, Category = "Character")
     int32 TeamID = 0;
+
+    virtual FName GetTargetBone() const { return TargetBone; }
 
 protected:
     UPROPERTY(EditDefaultsOnly, Category = Character)
