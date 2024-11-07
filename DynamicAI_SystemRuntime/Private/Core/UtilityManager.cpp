@@ -1,6 +1,7 @@
 #include "Core/UtilityManager.h"
 #include "Utility/Service.h"
 #include "Utility/Action.h"
+#include "Utility/FallbackAction.h"
 #include "AIController.h"
 
 DEFINE_LOG_CATEGORY(UtilityManagerLog);
@@ -149,7 +150,10 @@ void UUtilityManager::EvaluateActions()
         {
             _activeActions.Add(_evaluatedAction);
             _evaluatedAction->Execute();
+            FallbackAction->FinishExecute();
+            return;
         }
+        FallbackAction->Execute();
     }
 }
 

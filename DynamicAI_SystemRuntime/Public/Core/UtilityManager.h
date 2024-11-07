@@ -36,6 +36,7 @@
 // ⡿⠁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
 class UAction;
+class UFallbackAction;
 
 USTRUCT(BlueprintType)
 struct FActionsPool
@@ -165,6 +166,10 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Actions")
     TSet<FActionsPool> ActionsPools;
+
+    /** Action that was exexuting when no other action from pools will selected*/
+    UPROPERTY(EditDefaultsOnly, Instanced, Category  = "UtilityManager|Actions")
+    TObjectPtr<UFallbackAction> FallbackAction = GetMutableDefault<UFallbackAction>();
 
 public:
     virtual TObjectPtr<class UCurveTable> GetCurveTableAsset() { return ScorersCurveTable; }

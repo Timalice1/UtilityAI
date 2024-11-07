@@ -52,6 +52,7 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
     bool bCanRunConcurent = false;
 
+    /** Priority of this action within pool */
     UPROPERTY(EditAnywhere, Category = "ActionConfig", meta = (ClampMin = 0.01f))
     float ActionPriority = 1;
 
