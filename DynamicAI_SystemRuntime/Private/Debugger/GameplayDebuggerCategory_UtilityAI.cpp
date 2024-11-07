@@ -82,19 +82,21 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
             _action->GetActionScore());
 
         /*Show scorers for each active action*/
+        int i = 0;
         for (FScorer &_actionScorer : _action->GetScorers())
         {
-
             FString _scorerName = _actionScorer.ScorerTag.GetTagName().ToString();
             int32 index;
             _scorerName.FindLastChar(TEXT('.'), index);
             _scorerName.RemoveAt(0, index + 1, true);
 
             CanvasContext.Printf(
-                TEXT("\t\t\t{magenta}[%s%s]: %.5f"),
+                TEXT("\t\t\t{magenta}[%s%s%s]: %.5f"),
+                i == 0 ? TEXT("") : *(UEnum::GetValueAsString(_actionScorer.Operator) + FString(TEXT(" "))),
                 _actionScorer.Inverted ? TEXT("NOT ") : TEXT(""),
                 *_scorerName,
                 _actionScorer.GetScore());
+            ++i;
         }
     }
 
