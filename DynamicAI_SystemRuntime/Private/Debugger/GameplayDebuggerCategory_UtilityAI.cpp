@@ -58,14 +58,9 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
     CanvasContext.Printf(TEXT("\n{green}----------------Scorers---------------------"));
     for (FScorer &_scorer : DataPack.Scorers)
     {
-        FString _scorerName = _scorer.ScorerTag.GetTagName().ToString();
-        int32 index;
-        _scorerName.FindLastChar(TEXT('.'), index);
-        _scorerName.RemoveAt(0, index + 1, true);
-
         CanvasContext.Printf(
             TEXT("{green}[%s]: {yellow}%.4f"),
-            *_scorerName,
+            *_scorer.ScorerTag.GetTagName().ToString(),
             _scorer.GetRawScore());
     }
 
@@ -85,16 +80,11 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
         int i = 0;
         for (FScorer &_actionScorer : _action->GetScorers())
         {
-            FString _scorerName = _actionScorer.ScorerTag.GetTagName().ToString();
-            int32 index;
-            _scorerName.FindLastChar(TEXT('.'), index);
-            _scorerName.RemoveAt(0, index + 1, true);
-
             CanvasContext.Printf(
                 TEXT("\t\t\t{magenta}[%s%s%s]: %.5f"),
                 i == 0 ? TEXT("") : *(UEnum::GetValueAsString(_actionScorer.Operator) + FString(TEXT(" "))),
                 _actionScorer.Inverted ? TEXT("NOT ") : TEXT(""),
-                *_scorerName,
+                *_actionScorer.ScorerTag.GetTagName().ToString(),
                 _actionScorer.GetScore());
             ++i;
         }

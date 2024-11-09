@@ -24,7 +24,7 @@
 // ⣿⢿⣷⣄⡀⠀⠀⠈⣹⣿⣦⣄⣀⠀⠀⢀⡀⠀⣴⣿⣿⣿⠋⣸⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⢹⣿⣿
 // ⣿⣄⠠⣤⣤⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣀⠀⠹⠿⠟⠃⡀⠘⣿⣿⣿⡿⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀⣀⠤⣆⠑⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠈⣿
 // ⣿⣿⣷⣄⡙⠛⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣤⡖⣀⣄⠐⡄⠈⠉⠀⢀⣴⣿⣿⣿⣶⣶⣶⣶⣾⣿⠯⠒⠁⢀⣴⡄⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-// ⣿⣿⣿⡿⠏⠀⠄⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⢀⣤⠲⣞⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢠
+// ⣿⣿⣿⡿⠏⠀⠄⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⢀⣤⠲⣞⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⣿
 // ⣿⣿⣿⣤⠀⠀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⢁⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢀⣾
 // ⣿⣿⣿⡯⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⣠⣿⣿
 // ⣿⣿⣿⠃⠀⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⢁⣼⣿⣿⣿
@@ -45,7 +45,7 @@ struct FActionsPool
 
 public:
     UPROPERTY(EditDefaultsOnly)
-    FName PoolName;
+    FName PoolName = TEXT("Default");
 
     /**
      * ActionsPools with hightest priority will be evaluated first
@@ -105,6 +105,8 @@ class DYNAMICAI_SYSTEM_API UUtilityManager : public UActorComponent
 
     TArray<UAction *> _activeActions;
 
+    bool bCanSetScorer = true;
+
 private:
     virtual void PostReinitProperties() override;
 
@@ -117,6 +119,7 @@ private:
     /** Initialize all privided actions and their scorers */
     virtual void InitPools();
     virtual bool InitScorers();
+    virtual UConsideration *CreateScorer(FGameplayTag scorerTag) final;
 
     /**
      * Scoring each action from each pool, and execute action with best utility score.
@@ -168,7 +171,7 @@ protected:
     TSet<FActionsPool> ActionsPools;
 
     /** Action that was exexuting when no other action from pools will selected*/
-    UPROPERTY(EditDefaultsOnly, Instanced, Category  = "UtilityManager|Actions")
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "UtilityManager|Actions")
     TObjectPtr<UFallbackAction> FallbackAction = GetMutableDefault<UFallbackAction>();
 
 public:

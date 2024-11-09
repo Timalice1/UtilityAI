@@ -4,6 +4,54 @@
 #include "CoreMinimal.h"
 #include "Action.generated.h"
 
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⣛⡍⠙⢿⣿⠟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠟⣩⣥⣬⣭⣭⣍⣀⠲⠤⠄⠙⠈⡟⠄⠿⣛⣛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⣫⢀⣬⣍⣓⡚⢛⣛⣛⣛⣛⠛⠿⠿⠷⠄⠀⠀⣬⣶⠿⢛⣫⡉⠄⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⡛⣡⣾⠃⣿⣿⣿⣿⣿⣿⣏⣉⡳⠂⢉⣠⡰⢾⡷⠶⠒⠈⢐⠢⣭⡙⠻⣦⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢁⠊⣀⠌⢠⣶⣶⣀⣿⣿⢿⣿⣿⠿⠿⠝⠁⠀⢥⣬⣭⣭⣭⣄⡀⠠⠘⢿⡟⠝⢄⣦⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢿⡀⠠⠍⡀⠈⡿⠛⠟⠻⠷⡀⠈⠛⠈⠄⢬⣭⣄⣒⡈⢻⣭⣍⡉⠙⠓⠄⠰⡙⢷⡀⠹⣧⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⡩⠖⣈⡱⠦⠀⠀⠃⢃⠀⠠⠂⠄⡐⡀⣡⠳⣦⡌⢪⣿⣦⣍⠉⣛⡻⢟⠻⢷⣤⠀⠀⠘⡌⠳⡄⢹⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⣨⣶⡿⠁⣠⣭⢀⠔⢀⢁⡔⡠⢰⣶⡇⢿⣮⡁⢹⡛⠄⠉⠛⠧⠍⠀⠉⢂⣀⠐⣍⠳⠸⡆⠈⠀⠹⣇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⢃⣿⠀⡜⠘⣴⠇⣿⠏⡿⠀⠹⣿⣏⠻⣦⠘⠗⠀⠀⠀⠐⠀⠙⣧⠈⢳⡄⢻⣀⠹⣠⠹⡸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⢸⢃⠆⣷⡜⣹⢸⠏⠄⠃⠀⠂⠈⠙⠆⠀⠠⠐⣶⣧⠀⣰⣼⣿⠈⠂⢀⠁⢆⠈⠆⠘⢷⡅⢿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⡁⣠⣶⣿⣿⣿⣿⣿⣿⣿⣿⠈⠎⠂⢿⡇⠹⡌⠀⠸⠈⢀⣩⣀⣈⡙⠦⠹⣖⢨⣿⣿⣿⣿⣿⢐⣀⣌⠠⣄⠂⠻⡘⣷⣌⠈⢿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⢸⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⠀⠀⠈⠇⠀⢿⠀⠺⣤⣸⣿⣿⣿⣿⡷⣦⣽⣿⣿⣿⣿⣿⠇⠀⣿⡟⠣⡙⣧⡀⠑⠈⢿⣿⣦⡙⢿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⡐⠸⣦⡻⠿⣿⣿⣿⡿⠿⢟⠋⠁⠔⣊⣤⠀⠄⣀⠈⠆⠁⠈⢟⢿⣿⣿⣿⣄⣙⣿⠿⣫⣿⣿⠋⠀⠇⠘⢿⣌⠢⣌⡋⢦⡡⠰⣝⢿⣿⣆⢻⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⡿⠿⠿⠷⠄⠛⠿⣷⣶⣄⣀⡀⠅⠀⢊⠉⡉⠙⣿⣧⠀⡈⠁⡀⠀⢴⡦⠑⠻⢿⣿⣿⣶⣷⣿⣿⡿⡡⠀⠃⠀⠀⠀⠹⢿⣦⡙⠢⠑⣤⡈⢦⡹⣿⠈⣿⣿⣿⣿
+// ⣿⣿⣿⡟⢋⡠⠔⣛⣩⣭⣤⡤⠍⠀⠀⠀⣠⣴⡎⠀⠋⠈⠀⠆⡼⠿⠧⣼⡖⡀⠔⠚⠀⣘⡀⠀⠨⢉⠛⠻⠿⠋⠈⠄⠀⠀⣄⣧⠰⣤⡀⠙⠿⣎⡛⠶⢮⣤⣑⡀⠆⣿⣿⣿⣿
+// ⣿⡟⡩⣊⣵⣾⡿⢛⣩⠍⠀⠀⠠⠄⠀⠴⣿⣿⣷⡀⠀⢀⣠⠊⠀⠀⠀⠈⢰⣷⡀⢀⠈⠛⠃⡀⠀⠀⡉⠐⠒⠊⠁⡀⠀⣀⡙⢿⡆⣿⣷⠰⣶⣶⡄⠉⠐⢮⣙⠻⣷⣌⠻⣿⣿
+// ⣿⣆⣾⣿⣿⠡⡾⢁⡂⠐⠢⠤⠤⠐⠒⠂⠀⠈⠉⠛⠛⠋⠀⠀⠀⠀⠀⠀⢿⠿⠃⠿⣷⣦⣤⣈⠁⢀⡀⢠⠀⣠⣾⠷⠚⢋⣁⣈⡁⢻⣿⠀⣿⣿⣷⡸⣧⠀⠛⠿⣮⡙⢧⡘⣿
+// ⣻⣿⣿⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⢀⣤⠄⡰⢂⠐⢻⣧⠰⠀⢰⣷⣦⣬⣉⠛⠿⣿⣦⡀⠀⢸⡿⢀⣴⣾⣿⡿⠿⠇⢸⣿⠠⠿⣿⣿⣿⣦⣼⠀⢱⣮⠛⢦⠳⢸
+// ⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⢚⠩⢐⣩⡴⠞⢡⠃⠀⣿⣿⡆⠀⠈⣿⣿⠿⢿⣿⣶⣄⠙⣿⡀⠀⢀⣾⠟⢉⣠⣴⣶⣆⠹⠇⠀⠀⣿⠿⢛⠛⢿⠀⣸⣿⡇⣌⢣⢸
+// ⣿⣿⣿⣿⣿⣿⣿⣿⠷⠀⠀⠀⠀⠀⠀⠰⡀⠨⣭⣵⣶⡇⣾⢀⢰⣿⡿⠀⢀⠾⣛⡉⠀⠂⢹⣿⣿⣧⡈⢷⣶⠞⣁⣴⣿⣿⠟⠹⡟⠀⠀⠀⢠⡿⠈⣭⡅⠘⢰⣿⣿⡇⣿⡆⠆
+// ⣿⣿⣿⣿⣿⣿⢟⡕⣠⢂⣦⡉⠁⠀⠀⠀⠈⢄⠙⢿⣿⣿⡜⠸⢸⡿⢡⠇⣰⣾⣿⣿⢸⡄⢿⣿⣿⠁⠉⢠⠀⠚⢻⣿⣿⡟⠸⠃⢉⠀⠀⣴⠇⠁⠈⠥⠂⢠⣿⣿⣿⠰⣿⢃⠀
+// ⣿⣿⣿⣿⡿⣱⢋⠜⠁⣠⠞⣡⡆⢀⠀⡀⠀⠀⠀⠈⠻⣿⣷⣄⢆⠃⣿⠀⢻⣿⣿⣿⣶⣄⠈⢿⣿⣦⣀⣸⠀⣀⣸⣿⣿⡟⢀⣴⡸⡆⠠⡈⣔⠀⠠⢀⣴⣿⣿⠟⠁⡡⢣⣾⢀
+// ⣿⣿⣿⣿⢃⢃⠊⣰⢰⠏⣼⣿⡁⢸⣷⣄⠀⠑⢶⣆⠀⠘⠻⢿⣦⠸⣿⣇⠀⠻⢿⣿⣿⣿⣷⡶⠘⢋⣿⣟⢻⠿⢛⣛⣋⣴⣾⣿⣷⡄⠀⠁⠛⢀⣴⣿⣿⣿⠶⠂⣀⣴⣿⠏⣼
+// ⣿⣿⣿⣿⠀⠂⣴⣿⢸⢸⣿⣿⣧⠈⡟⠉⡑⠄⠀⠙⣷⣤⣦⣆⠈⣧⡙⠛⠀⠌⠒⠮⠭⠭⠅⠀⡀⠿⠿⠿⠀⠘⠿⠿⠿⢛⣋⣭⠉⠀⠰⠁⢀⣾⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⡄⢰⣿⣿⡌⠸⣿⣿⣿⣷⣷⠀⠁⠀⠀⠑⠀⠙⣿⣿⡀⠉⢔⠀⠀⠀⠀⠀⢆⠐⠵⣾⣶⣶⣶⣶⡦⠑⠈⠉⢛⠛⠉⠀⠀⠠⠁⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣇⠀⠙⢿⣿⣦⣙⣿⣿⡿⠃⣀⠂⠀⠐⠈⠃⢈⡁⠄⠁⠀⣡⡀⡄⢈⣄⠀⠰⢦⡢⠄⢁⢩⣭⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠱⣜⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣷⣾⣿⣿⣿⣿⠋⠴⠶⠖⠀⠀⡀⠠⠈⠁⠐⢠⡎⢸⣿⣧⠀⣜⢿⠷⠄⠀⠀⠀⠈⠈⠉⠀⠀⠠⣴⢀⠆⠀⠀⠀⠀⡠⠰⣅⣀⣉⣒⣈⣽⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⡆⠑⠁⠀⢀⡴⠉⡇⢸⣿⣿⣷⡈⢮⣷⡄⠠⣤⣤⣀⣴⣦⣬⠒⠀⠆⠊⠀⠀⠀⠀⠀⣷⣄⠈⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡠⠤⢒⣉⡁⢀⣼⣿⣿⡇⡆⠁⠸⣿⣿⣿⣿⣄⠠⠀⢰⣿⣿⣿⣿⡏⠀⠀⡀⢸⠀⠀⠀⠀⠠⢰⣿⣿⣿⣶⣦⣬⣭⣽⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⢠⣿⣿⣿⡏⠀⡇⠀⡀⢿⣿⣿⣿⣿⡇⠀⠜⣿⣿⣿⡟⠀⢠⠈⠁⠀⡀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⣾⣿⣿⣿⣧⢀⢀⡀⠰⠘⣿⣿⣿⡿⠁⠀⣀⣿⡿⠋⠀⠀⡀⢆⢸⠀⣷⠀⠀⢠⠁⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⣿⡌⡘⣷⡀⠀⣿⣿⡿⠃⠀⣪⣾⠟⠁⢀⠄⣰⣿⡆⠆⠀⠹⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀⠈⣿⣿⣿⣿⣷⠰⡘⣿⡄⠘⣉⠴⣀⣴⠿⠁⠠⠀⣡⣾⣿⣿⣿⡐⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠸⣿⣿⣿⣿⣇⢣⠹⣷⡈⠀⣿⡟⠁⠀⣠⡄⢰⣿⣿⣿⣿⣿⣧⠀⠀⣰⠀⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢄⠀⠀⠙⢿⣿⣿⣿⡘⣧⠹⣷⡈⣭⣤⡄⢀⣻⣧⠘⣿⣿⣿⣿⣿⡏⠈⠆⣿⣦⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠈⠢⠀⠀⠈⠻⣿⣿⣷⡸⣇⢻⣷⠸⣿⣿⡄⠹⣿⣧⠸⣿⣿⠟⠁⠂⡆⢠⣿⡏⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠁⡄⣦⡀⠀⢸⣿⣿⣷⡘⡌⣿⡇⢿⣿⣿⡄⠹⣿⡄⢻⡟⠀⠐⠂⠬⠘⠛⣁⡆⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠃⢸⣿⣦⠀⣿⣿⣿⣷⡰⡘⣿⠸⣿⣿⣿⡄⠹⣿⡈⣧⠀⠑⢄⠀⣾⣿⡿⠐⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠘⢿⣿⣿⣿⣿⣿⣿⣧⢁⢻⡇⣿⣿⣿⣷⡄⠹⣷⡈⠈⠁⠠⠄⠉⠀⢀⣤⡀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⡌⠸⣧⢹⣿⣿⣿⣿⣄⠉⡅⢰⡆⢠⣿⣶⣾⣿⣿⣿⡖⠲⣦⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠠⠀⠀⠀⠘⣿⡿⠛⠛⢇⠇⣿⢸⣿⣿⣿⣿⣿⣦⠀⠈⡞⠀⠉⠻⣿⣿⠻⣿⠙⠲⣦⡌⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⢀⡀⢦⣀⣿⡇⢠⡍⠈⢀⢻⡀⣿⣿⣿⣿⣿⣿⣧⠰⡇⠸⠲⡄⠈⠿⡄⠙⠛⠳⢦⠙⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠐⡈⣿⣿⣇⢸⣿⡀⠘⢸⡇⣿⣿⣿⣿⣿⣿⣿⠃⡇⠀⠐⣿⠀⠀⠈⠢⠀⠄⠀⠃⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠱⠘⣿⣯⠸⣿⣧⠂⠀⢇⢹⣿⣿⣿⣿⣿⣿⣷⣴⣷⣄⠃⠀⡉⡀⠀⠐⢄⠀⠀⠁⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⢃⢹⣿⠀⢿⣿⠀⡀⢸⡈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠁⡘⣷⣦⣀⠑⣠⣶⣦⡙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⡄⡟⠀⢸⣿⣆⠻⡌⠣⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⢰⣕⣌⡛⠻⠿⣿⣿⣿⣷⡜⣿⣿⣿⣿⣿⣿⣿⣿⣿
+// ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠱⠀⢠⢸⣿⣿⣷⡄⠀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡌⢻⣿⣿⣿⣦⡘⢿⡿⢻⣷⢸⣿⣿⣿⣿⣿⣿⣿⣿
+
 UENUM(BlueprintType)
 enum EScoreType : uint8
 {
@@ -30,11 +78,15 @@ class UAction : public UObject
 {
     GENERATED_BODY()
 
-
     float ActionScore = 0.f;
+    bool bIsFinished = true;
+    bool bCanBeEvaluated = true;
+
+    FTimerHandle _timeoutTimer;
 
 private:
     virtual UWorld *GetWorld() const override;
+    virtual void ResetTimeout() final;
 
 #if WITH_EDITOR
     virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
@@ -52,9 +104,17 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
     bool bCanRunConcurent = false;
 
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig", AdvancedDisplay,
+              meta = (EditCondition = "bCanRunConcurent == true"))
+    TSet<TSubclassOf<UAction>> ConcurencyExceptions;
+
     /** Priority of this action within pool */
-    UPROPERTY(EditAnywhere, Category = "ActionConfig", meta = (ClampMin = 0.01f))
-    float ActionPriority = 1;
+    UPROPERTY(EditAnywhere, Category = "ActionConfig", meta = (ClampMin = 1))
+    uint32 ActionPriority = 1;
+
+    /** Time while action was closed for evalueating since last execution */
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig", meta = (ClampMin = .0f))
+    float Timeout = .1f;
 
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
     TEnumAsByte<EScoreType> ScoreType;
@@ -87,9 +147,8 @@ public:
     void FinishExecute();
 
 public:
-    bool IsFinished = true;
 
-    UAction(){};
+    UAction() {};
 
     /** Initialize action */
     virtual void Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TObjectPtr<UConsideration>> InConsiderations);
@@ -102,11 +161,16 @@ public:
 
     virtual float GetActionScore() const { return ActionScore; }
 
-    virtual bool CanRunConcurrentlyWith(UAction* OtherAction) const
+    virtual bool CanRunConcurrentlyWith(UAction *OtherAction) const
     {
-        return bCanRunConcurent && OtherAction->bCanRunConcurent;
+        return bCanRunConcurent &&
+               OtherAction->bCanRunConcurent &&
+               !ConcurencyExceptions.Contains(OtherAction->GetClass());
     }
 
     /** @return all scorers tags related to this action*/
     virtual TArray<FScorer> GetScorers() { return Scorers; };
+
+    virtual bool IsFinished() const {return bIsFinished;}
+    virtual bool CanBeEvaluated() const {return bCanBeEvaluated && bIsFinished;}
 };

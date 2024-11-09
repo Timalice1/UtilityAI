@@ -10,7 +10,7 @@ class UConsideration : public UObject
     GENERATED_BODY()
 
 private:
-    float _value = 0.f;
+    float _value;
     FRichCurve _responseCurve;
 
 public:
@@ -38,7 +38,7 @@ UENUM(BlueprintType)
 enum EOperator : uint8
 {
     AND,
-    OR
+    OR,
 };
 
 USTRUCT(BlueprintType)

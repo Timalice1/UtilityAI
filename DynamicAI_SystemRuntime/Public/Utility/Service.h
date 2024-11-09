@@ -3,18 +3,28 @@
 #include "AIController.h"
 #include "Service.generated.h"
 
+class APawn;
+class UUtilityManager;
+class AAIController;
+
 UCLASS(MinimalAPI, Abstract, EditInlineNew, Blueprintable, BlueprintType)
 class UService : public UObject
 {
     GENERATED_BODY()
 
 private:
-    UPROPERTY()
-    TObjectPtr<class UUtilityManager> _manager;
-    UPROPERTY()
-    TObjectPtr<class AAIController> _controller;
-    UPROPERTY()
-    TObjectPtr<class APawn> _pawn;
+    TObjectPtr<UUtilityManager> _manager;
+    TObjectPtr<AAIController> _controller;
+    TObjectPtr<APawn> _pawn;
+
+protected: 
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UtilitySystem|Service")
+    APawn *GetPawn() { return _pawn;}
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UtilitySystem|Service")
+    UUtilityManager *GetUtilityManager() { return _manager; };
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "UtilitySystem|Service")
+    AAIController *GetController() { return _controller; };
 
 public: // Parent class overrides
     UService() : Super() {};

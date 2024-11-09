@@ -16,8 +16,6 @@ void UAction::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent
             Scorers[i].FirstElement = false;
     }
     Modify();
-
-    
 }
 #endif
 
@@ -88,8 +86,9 @@ float UAction::EvaluateActionScore()
         for (int i = 1; i < Scorers.Num(); i++)
         {
             float currentScore = Scorers[i].GetScore();
+
             if (Scorers[i].Operator == OR)
-                ActionScore += currentScore;
+                ActionScore = FMath::Clamp(ActionScore + currentScore, 0, 1);
             else
                 ActionScore *= currentScore;
         }
@@ -99,13 +98,27 @@ float UAction::EvaluateActionScore()
 
 void UAction::Execute()
 {
-    IsFinished = false;
     if (_controller && _pawn)
+    {
         this->ExecuteAction(_controller, _pawn);
+        bIsFinished = false;
+    }
 }
 
 void UAction::FinishExecute()
 {
-    IsFinished = true;
+    bIsFinished = true;
     OnActionFinished(_controller, _pawn);
+    if (Timeout > .0f)
+    {
+        bCanBeEvaluated = false;
+        GetWorld()->GetTimerManager().SetTimer(_timeoutTimer, this, &UAction::ResetTimeout, Timeout);
+    }
+}
+
+void UAction::ResetTimeout()
+{
+    bCanBeEvaluated = true;
+    GetWorld()->GetTimerManager().ClearTimer(_timeoutTimer);
+    UE_LOG(LogTemp, Warning, TEXT("%s: timeout reset"), *GetName());
 }

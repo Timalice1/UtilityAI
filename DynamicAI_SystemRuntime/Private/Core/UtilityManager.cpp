@@ -43,7 +43,7 @@ void UUtilityManager::PostReinitProperties()
 
     /*Init properies before owner begin play */
     InitPools();
-    InitScorers(); 
+    InitScorers();
 
     Super::PostReinitProperties();
 }
@@ -53,11 +53,9 @@ void UUtilityManager::Activate(bool bReset)
     if (GIsEditor && !GIsPlayInEditorWorld)
         return Super::Activate(bReset);
 
-    
-
     GetWorld()
         ->GetTimerManager()
-        .SetTimer(evaluationTimer, this, &ThisClass::EvaluateActions, EvaluationInterval, true, 0);
+        .SetTimer(evaluationTimer, this, &ThisClass::EvaluateActions, EvaluationInterval, true);
 
     Super::Activate(bReset);
     UE_LOG(UtilityManagerLog, Log, TEXT("[%s]: UtilityManager activated"), *GetOwner()->GetName());
@@ -67,7 +65,8 @@ void UUtilityManager::Deactivate()
 {
     GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 
-    for (UService *_service : Services){
+    for (UService *_service : Services)
+    {
         GetWorld()->GetTimerManager().ClearTimer(_service->tickTimer);
         _service = nullptr;
         _service->ConditionalBeginDestroy();
@@ -112,17 +111,20 @@ bool UUtilityManager::InitScorers()
             if (!tag.IsValid())
                 continue;
             if (!_considerations.Contains(tag))
-            {
-                UConsideration *_newCons = NewObject<UConsideration>(this, UConsideration::StaticClass(), tag.GetTagName());
-                _actionConsiderations.Add(tag, _newCons);
-                _considerations.Add(tag, _newCons);
-            }
+                _actionConsiderations.Add(tag, CreateScorer(tag));
             else
                 _actionConsiderations.Add(tag, *_considerations.Find(tag));
         }
         _actionsScorers.Add(action, _actionConsiderations);
     }
     return true;
+}
+
+UConsideration *UUtilityManager::CreateScorer(FGameplayTag scorerTag)
+{
+    UConsideration *_newCons = NewObject<UConsideration>(this, UConsideration::StaticClass(), scorerTag.GetTagName());
+    _considerations.Add(scorerTag, _newCons);
+    return _newCons;
 }
 
 bool UUtilityManager::IsEmpty()
@@ -138,7 +140,7 @@ bool UUtilityManager::IsEmpty()
 void UUtilityManager::EvaluateActions()
 {
     _activeActions.RemoveAll([](UAction *_action)
-                             { return _action->IsFinished; });
+                             { return _action->IsFinished(); });
 
     _pools.Sort([](const FActionsPool &p1, const FActionsPool &p2)
                 { return p1.Priority > p2.Priority; });
@@ -159,12 +161,15 @@ void UUtilityManager::EvaluateActions()
 
 void UUtilityManager::AbortActiveActions()
 {
-    for(UAction *_action : _activeActions)
+    for (UAction *_action : _activeActions)
         _action->FinishExecute();
 }
 
 bool UUtilityManager::CanRunConcurent(UAction *Action) const
 {
+    if (_activeActions.IsEmpty())
+        return true;
+
     for (UAction *_action : _activeActions)
     {
         if (Action == _action || !Action->CanRunConcurrentlyWith(_action))
@@ -176,10 +181,10 @@ bool UUtilityManager::CanRunConcurent(UAction *Action) const
 }
 
 void UUtilityManager::SetScorerValue(FGameplayTag InScorerTag, float InValue)
-{
-    if(AController* controller = Cast<AController>(GetOwner()))
+{   
+    if (AController *controller = Cast<AController>(GetOwner()))
     {
-        if(!controller->GetPawn())
+        if (!controller->GetPawn())
             return;
     }
 
@@ -190,19 +195,18 @@ void UUtilityManager::SetScorerValue(FGameplayTag InScorerTag, float InValue)
         return;
     }
 
-    if (!InScorerTag.IsValid() ||
-        !_considerations.Contains(InScorerTag))
+    if (!InScorerTag.IsValid())
     {
         UE_LOG(UtilityManagerLog, Warning,
-               TEXT("UtilityManager::SetScorerValue - tag is invalid or no scorer with tag [%s] is defined"),
-               *InScorerTag.GetTagName().ToString());
+               TEXT("UtilityManager::SetScorerValue - tag is invalid"));
         return;
     }
 
-    if (UConsideration *cons = *_considerations.Find(InScorerTag))
-        cons->SetValue(InValue);
+    if (!_considerations.Contains(InScorerTag))
+        return;
 
-    return;
+    TObjectPtr<UConsideration> _cons = *_considerations.Find(InScorerTag);
+    _cons->SetValue(InValue);
 }
 
 void UUtilityManager::ResetScorers(FGameplayTagContainer InScorersTags)
@@ -275,12 +279,6 @@ void UUtilityManager::CreateCurve(FName Name)
 
 void UUtilityManager::ResetConsiderations()
 {
-    if (IsValid(ScorersCurveTable))
-    {
-        ScorersCurveTable->EmptyTable();
-        UE_LOG(UtilityManagerLog, Log, TEXT("[%s]: table is cleared"), *ScorersCurveTable->GetName());
-    }
-
     _considerations.Empty();
     UE_LOG(UtilityManagerLog, Log, TEXT("Considerations map is cleared"));
 }
@@ -291,9 +289,9 @@ TObjectPtr<UAction> FActionsPool::EvaluateActions()
 {
     UAction *_bestAction = nullptr;
     float maxScore = 0;
-    for (const TObjectPtr<UAction> &action : Actions)
+    for (UAction *action : Actions)
     {
-        if (!action)
+        if (!action || !action->CanBeEvaluated())
             continue;
         float currentScore = action->EvaluateActionScore();
         if (currentScore > maxScore && currentScore > ScoreThresshold)
