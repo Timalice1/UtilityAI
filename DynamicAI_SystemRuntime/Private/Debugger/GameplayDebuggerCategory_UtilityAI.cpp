@@ -11,6 +11,9 @@
 FGameplayDebuggerCategory_UtilityAI::FGameplayDebuggerCategory_UtilityAI()
 {
     SetDataPackReplication<FRepData>(&DataPack);
+
+    const FGameplayDebuggerInputHandlerConfig DetailsConfig(TEXT("ToggleDetails"), TEXT("Divide"));
+    BindKeyPress(DetailsConfig, this, &FGameplayDebuggerCategory_UtilityAI::ToggleDetailView);
 }
 
 void FGameplayDebuggerCategory_UtilityAI::CollectData(APlayerController *OwnerPC, AActor *DebugActor)
@@ -52,16 +55,22 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
     CanvasContext.Printf(TEXT("{green}Actor: {yellow}[%s]"), *DataPack.ActorName);
     CanvasContext.Printf(TEXT("{green}Utility manager: {yellow}[%s]"), *DataPack.UtilityManager);
 
+    if (DataPack.Scorers.Num() > 1)
+        CanvasContext.Print(FString::Printf(TEXT("{green}Press {yellow}[%s]{green} to show details"), *GetInputHandlerDescription(0)));
+
     /*-----
     Scorers
     -----*/
-    CanvasContext.Printf(TEXT("\n{green}----------------Scorers---------------------"));
-    for (FScorer &_scorer : DataPack.Scorers)
+    if (bShowDetails)
     {
-        CanvasContext.Printf(
-            TEXT("{green}[%s]: {yellow}%.4f"),
-            *_scorer.ScorerTag.GetTagName().ToString(),
-            _scorer.GetRawScore());
+        CanvasContext.Printf(TEXT("\n{green}----------------Scorers---------------------"));
+        for (FScorer &_scorer : DataPack.Scorers)
+        {
+            CanvasContext.Printf(
+                TEXT("{green}[%s]: {yellow}%.4f"),
+                *_scorer.ScorerTag.GetTagName().ToString(),
+                _scorer.GetRawScore());
+        }
     }
 
     /*----------
@@ -75,19 +84,7 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
             TEXT("\t\t{green}[%s]: {yellow}%.4f"),
             *_action->GetName(),
             _action->GetActionScore());
-
-        /*Show scorers for each active action*/
-        int i = 0;
-        for (FScorer &_actionScorer : _action->GetScorers())
-        {
-            CanvasContext.Printf(
-                TEXT("\t\t\t{magenta}[%s%s%s]: %.5f"),
-                i == 0 ? TEXT("") : *(UEnum::GetValueAsString(_actionScorer.Operator) + FString(TEXT(" "))),
-                _actionScorer.Inverted ? TEXT("NOT ") : TEXT(""),
-                *_actionScorer.ScorerTag.GetTagName().ToString(),
-                _actionScorer.GetScore());
-            ++i;
-        }
+        ShowScorers(_action, CanvasContext);
     }
 
     /*---
@@ -97,7 +94,7 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
     for (const FActionsPool &_pool : DataPack.Pools)
     {
         CanvasContext.Printf(TEXT("\t\t{magenta}[%s]:"), *_pool.PoolName.ToString());
-        for (const UAction *_action : _pool.GetActions())
+        for (UAction *_action : _pool.GetActions())
         {
             if (_action)
             {
@@ -105,8 +102,26 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
                     TEXT("\t\t\t{green}[%s]: {yellow}%.4f"),
                     *_action->GetName(),
                     _action->GetActionScore());
+                ShowScorers(_action, CanvasContext);
             }
         }
+    }
+}
+
+void FGameplayDebuggerCategory_UtilityAI::ShowScorers(UAction *_action, FGameplayDebuggerCanvasContext &CanvasContext)
+{
+    if (!bShowDetails)
+        return;
+    int i = 0;
+    for (FScorer &_actionScorer : _action->GetScorers())
+    {
+        CanvasContext.Printf(
+            TEXT("\t\t\t{magenta}[%s%s%s]: %.5f"),
+            i == 0 ? TEXT("") : *(UEnum::GetValueAsString(_actionScorer.Operator) + FString(TEXT(" "))),
+            _actionScorer.Inverted ? TEXT("NOT ") : TEXT(""),
+            *_actionScorer.ScorerTag.GetTagName().ToString(),
+            _actionScorer.GetScore());
+        ++i;
     }
 }
 
@@ -115,6 +130,11 @@ void FGameplayDebuggerCategory_UtilityAI::FRepData::Serialize(FArchive &Ar)
     Ar << ActorName;
     Ar << ControllerName;
     Ar << UtilityManager;
+}
+
+void FGameplayDebuggerCategory_UtilityAI::ToggleDetailView()
+{
+    bShowDetails = !bShowDetails;
 }
 
 #endif

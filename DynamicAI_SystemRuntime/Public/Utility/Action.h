@@ -79,14 +79,13 @@ class UAction : public UObject
     GENERATED_BODY()
 
     float ActionScore = 0.f;
-    bool bIsFinished = true;
     bool bCanBeEvaluated = true;
 
     FTimerHandle _timeoutTimer;
 
 private:
     virtual UWorld *GetWorld() const override;
-    virtual void ResetTimeout() final;
+    FORCEINLINE void ResetTimeout();
 
 #if WITH_EDITOR
     virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
@@ -147,21 +146,18 @@ public:
     void FinishExecute();
 
 public:
+    bool IsFinished = true;
 
     UAction() {};
 
     /** Initialize action */
-    virtual void Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TObjectPtr<UConsideration>> InConsiderations);
-
+    void Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TObjectPtr<UConsideration>> InConsiderations);
     /** Calculate action score based on score type and linked scorers */
-    virtual float EvaluateActionScore();
-
+    float EvaluateActionScore();
     /** Call's action implementation */
-    virtual void Execute();
-
-    virtual float GetActionScore() const { return ActionScore; }
-
-    virtual bool CanRunConcurrentlyWith(UAction *OtherAction) const
+    void Execute();
+    FORCEINLINE float GetActionScore() const { return ActionScore; }
+    FORCEINLINE bool CanRunConcurrentlyWith(UAction *OtherAction) const
     {
         return bCanRunConcurent &&
                OtherAction->bCanRunConcurent &&
@@ -169,8 +165,7 @@ public:
     }
 
     /** @return all scorers tags related to this action*/
-    virtual TArray<FScorer> GetScorers() { return Scorers; };
+    FORCEINLINE virtual TArray<FScorer> GetScorers() { return Scorers; };
 
-    virtual bool IsFinished() const {return bIsFinished;}
-    virtual bool CanBeEvaluated() const {return bCanBeEvaluated && bIsFinished;}
+    FORCEINLINE virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
 };

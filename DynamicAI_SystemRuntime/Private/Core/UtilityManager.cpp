@@ -1,7 +1,6 @@
 #include "Core/UtilityManager.h"
 #include "Utility/Service.h"
 #include "Utility/Action.h"
-#include "Utility/FallbackAction.h"
 #include "AIController.h"
 
 DEFINE_LOG_CATEGORY(UtilityManagerLog);
@@ -25,8 +24,8 @@ void UUtilityManager::BeginPlay()
 
     for (auto &_action : _actionsScorers)
         _action.Key->Init(this, _action.Value);
-    _actionsScorers.Empty();
 
+    _actionsScorers.Empty();
     Super::BeginPlay();
 }
 
@@ -140,7 +139,7 @@ bool UUtilityManager::IsEmpty()
 void UUtilityManager::EvaluateActions()
 {
     _activeActions.RemoveAll([](UAction *_action)
-                             { return _action->IsFinished(); });
+                             { return _action->IsFinished; });
 
     _pools.Sort([](const FActionsPool &p1, const FActionsPool &p2)
                 { return p1.Priority > p2.Priority; });
@@ -148,14 +147,13 @@ void UUtilityManager::EvaluateActions()
     for (FActionsPool &_pool : _pools)
     {
         UAction *_evaluatedAction = _pool.EvaluateActions();
-        if (_evaluatedAction && CanRunConcurent(_evaluatedAction))
+        if (_evaluatedAction &&
+            CanRunConcurent(_evaluatedAction))
         {
             _activeActions.Add(_evaluatedAction);
             _evaluatedAction->Execute();
-            FallbackAction->FinishExecute();
             return;
         }
-        FallbackAction->Execute();
     }
 }
 
@@ -181,7 +179,7 @@ bool UUtilityManager::CanRunConcurent(UAction *Action) const
 }
 
 void UUtilityManager::SetScorerValue(FGameplayTag InScorerTag, float InValue)
-{   
+{
     if (AController *controller = Cast<AController>(GetOwner()))
     {
         if (!controller->GetPawn())
@@ -293,6 +291,10 @@ TObjectPtr<UAction> FActionsPool::EvaluateActions()
     {
         if (!action || !action->CanBeEvaluated())
             continue;
+        // if(!action->bIsFinished)
+        // {
+        //     UE_LOG(UtilityManagerLog, Warning, TEXT("[%s]: action is not finished"), *action->GetName());
+        // }
         float currentScore = action->EvaluateActionScore();
         if (currentScore > maxScore && currentScore > ScoreThresshold)
         {

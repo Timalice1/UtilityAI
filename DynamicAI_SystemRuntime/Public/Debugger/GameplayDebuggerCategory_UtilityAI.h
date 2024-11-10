@@ -28,7 +28,7 @@ protected:
         FString ActorName;
         FString UtilityManager;
 
-        TArray<UAction*> ActiveActions;
+        TArray<UAction *> ActiveActions;
         TArray<struct FActionsPool> Pools;
         TArray<struct FScorer> Scorers;
 
@@ -36,6 +36,10 @@ protected:
     };
 
     FRepData DataPack;
+
+    void ToggleDetailView();
+    void ShowScorers(class UAction* _action, FGameplayDebuggerCanvasContext &CanvasContext);
+    uint32 bShowDetails : 1;
 };
 
 #endif

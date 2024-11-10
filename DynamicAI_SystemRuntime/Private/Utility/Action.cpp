@@ -98,16 +98,13 @@ float UAction::EvaluateActionScore()
 
 void UAction::Execute()
 {
+    IsFinished = false;
     if (_controller && _pawn)
-    {
         this->ExecuteAction(_controller, _pawn);
-        bIsFinished = false;
-    }
 }
-
 void UAction::FinishExecute()
 {
-    bIsFinished = true;
+    IsFinished = true;
     OnActionFinished(_controller, _pawn);
     if (Timeout > .0f)
     {
@@ -120,5 +117,4 @@ void UAction::ResetTimeout()
 {
     bCanBeEvaluated = true;
     GetWorld()->GetTimerManager().ClearTimer(_timeoutTimer);
-    UE_LOG(LogTemp, Warning, TEXT("%s: timeout reset"), *GetName());
 }
