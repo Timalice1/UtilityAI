@@ -2,6 +2,8 @@
 #include "CoreMinimal.h"
 #include "UtilityInterface.generated.h"
 
+class UUtilityManager;
+
 UINTERFACE()
 class DYNAMICAI_SYSTEM_API UUtilityInterface : public UInterface
 {
@@ -12,7 +14,6 @@ class DYNAMICAI_SYSTEM_API IUtilityInterface
 {
     GENERATED_BODY()
 public:
-    /*Override this event and update all neceessary scorers values directly in controller/pawn*/
-    UFUNCTION(BlueprintImplementableEvent, Category = "UtilityManagerInterface")
-    void UpdateScorers();
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "UtilityManagerInterface")
+    UUtilityManager* GetUtilityManager(); 
 };

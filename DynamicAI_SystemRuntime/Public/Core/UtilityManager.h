@@ -76,6 +76,10 @@ public:
     TArray<TObjectPtr<UAction>> GetActions() { return Actions; }
     TArray<TObjectPtr<UAction>> GetActions() const { return Actions; }
 
+    FORCEINLINE void SetPoolPriority(int32 NewPriority) { 
+        Priority = NewPriority; 
+    }
+
     friend uint32 GetTypeHash(const FActionsPool &pool)
     {
         return FCrc::MemCrc32(&pool, sizeof(FActionsPool));
@@ -181,4 +185,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
     void AbortActiveActions();
+
+    UFUNCTION(BlueprintCallable, Category = UtilityManager)
+    bool SetPoolPriority(FName PoolName, int32 Priority);
 };

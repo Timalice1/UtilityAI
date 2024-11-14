@@ -13,7 +13,10 @@ FGameplayDebuggerCategory_UtilityAI::FGameplayDebuggerCategory_UtilityAI()
     SetDataPackReplication<FRepData>(&DataPack);
 
     const FGameplayDebuggerInputHandlerConfig DetailsConfig(TEXT("ToggleDetails"), TEXT("Divide"));
+    const FGameplayDebuggerInputHandlerConfig ActiveActionsConfig(TEXT("ToogleActiveActions"), TEXT("Multiply"));
+
     BindKeyPress(DetailsConfig, this, &FGameplayDebuggerCategory_UtilityAI::ToggleDetailView);
+    BindKeyPress(ActiveActionsConfig, this, &FGameplayDebuggerCategory_UtilityAI::ToggleActiveActions);
 }
 
 void FGameplayDebuggerCategory_UtilityAI::CollectData(APlayerController *OwnerPC, AActor *DebugActor)
@@ -57,34 +60,35 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
 
     if (DataPack.Scorers.Num() > 1)
         CanvasContext.Print(FString::Printf(TEXT("{green}Press {yellow}[%s]{green} to show details"), *GetInputHandlerDescription(0)));
+    CanvasContext.Print(FString::Printf(TEXT("{green}Press {yellow}[%s]{green} to show active actions"), *GetInputHandlerDescription(1)));
 
     /*-----
     Scorers
     -----*/
-    if (bShowDetails)
+    CanvasContext.Printf(TEXT("\n{green}----------------Scorers---------------------"));
+    for (FScorer &_scorer : DataPack.Scorers)
     {
-        CanvasContext.Printf(TEXT("\n{green}----------------Scorers---------------------"));
-        for (FScorer &_scorer : DataPack.Scorers)
-        {
-            CanvasContext.Printf(
-                TEXT("{green}[%s]: {yellow}%.4f"),
-                *_scorer.ScorerTag.GetTagName().ToString(),
-                _scorer.GetRawScore());
-        }
+        CanvasContext.Printf(
+            TEXT("{green}[%s]: {yellow}%.4f"),
+            *_scorer.ScorerTag.GetTagName().ToString(),
+            _scorer.GetRawScore());
     }
 
     /*----------
     Active actions
     ----------*/
-    CanvasContext.Printf(TEXT("\n{green}----------------Active actions----------------"));
-    for (UAction *_action : DataPack.ActiveActions)
+    if (bShowActiveActions)
     {
-        /** Show active actions  */
-        CanvasContext.Printf(
-            TEXT("\t\t{green}[%s]: {yellow}%.4f"),
-            *_action->GetName(),
-            _action->GetActionScore());
-        ShowScorers(_action, CanvasContext);
+        CanvasContext.Printf(TEXT("\n{green}----------------Active actions----------------"));
+        for (UAction *_action : DataPack.ActiveActions)
+        {
+            /** Show active actions  */
+            CanvasContext.Printf(
+                TEXT("\t\t{green}[%s]: {yellow}%.4f"),
+                *_action->GetName(),
+                _action->GetActionScore());
+            ShowScorers(_action, CanvasContext);
+        }
     }
 
     /*---
@@ -135,6 +139,10 @@ void FGameplayDebuggerCategory_UtilityAI::FRepData::Serialize(FArchive &Ar)
 void FGameplayDebuggerCategory_UtilityAI::ToggleDetailView()
 {
     bShowDetails = !bShowDetails;
+}
+void FGameplayDebuggerCategory_UtilityAI::ToggleActiveActions()
+{
+    bShowActiveActions = !bShowActiveActions;
 }
 
 #endif

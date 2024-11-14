@@ -2,6 +2,7 @@
 
 #include "GameplayTags.h"
 #include "CoreMinimal.h"
+#include "Utility/Scorer.h"
 #include "Action.generated.h"
 
 // ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⣛⡍⠙⢿⣿⠟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -65,7 +66,6 @@ class APawn;
 class UService;
 class UUtilityManager;
 class UConsideration;
-struct FScorer;
 
 UCLASS(MinimalAPI,
        BlueprintType,
@@ -78,10 +78,13 @@ class UAction : public UObject
 {
     GENERATED_BODY()
 
+private:
     float ActionScore = 0.f;
     bool bCanBeEvaluated = true;
 
     FTimerHandle _timeoutTimer;
+
+    FRichCurve ModifierCurve;
 
 private:
     virtual UWorld *GetWorld() const override;
@@ -126,10 +129,13 @@ public:
 
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig",
               meta = (EditCondition = "ScoreType==EScoreType::EST_Evaluated",
-                      EditConditionHides,
-                      EditInline = false))
-    TArray<FScorer> Scorers;
+                      EditConditionHides))
+    TArray<FScorerPool> Scorers;
 
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
+    FCurveTableRowHandle UtilityModifier_Curve;
+
+protected:
     UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action", BlueprintPure)
     UUtilityManager *GetUtilityManager() { return _manager; }
 
@@ -161,11 +167,17 @@ public:
     {
         return bCanRunConcurent &&
                OtherAction->bCanRunConcurent &&
+               OtherAction != this &&
                !ConcurencyExceptions.Contains(OtherAction->GetClass());
     }
 
     /** @return all scorers tags related to this action*/
-    FORCEINLINE virtual TArray<FScorer> GetScorers() { return Scorers; };
+    FORCEINLINE virtual TArray<FScorer> GetScorers() {
+        TArray<FScorer> _allScorers;
+        for(FScorerPool &_layer : Scorers)
+            _allScorers.Append(_layer.GetScorers());
+        return _allScorers;
+    };
 
     FORCEINLINE virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
 };

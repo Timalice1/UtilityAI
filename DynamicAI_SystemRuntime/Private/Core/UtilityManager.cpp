@@ -221,6 +221,19 @@ void UUtilityManager::ResetScorers(FGameplayTagContainer InScorersTags)
         SetScorerValue(_tag, 0.f);
 }
 
+bool UUtilityManager::SetPoolPriority(FName PoolName, int32 Priority)
+{
+    FActionsPool *_pool = _pools.FindByPredicate([PoolName](const FActionsPool &elem)
+                                                 { return elem.PoolName == PoolName; });
+    if (_pool)
+    {
+        _pool->SetPoolPriority(Priority);
+        return true;
+    }
+    UE_LOG(UtilityManagerLog, Warning, TEXT("Pool with name [%s] not found"), *PoolName.ToString());
+    return false;
+}
+
 #if WITH_EDITOR
 void UUtilityManager::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {

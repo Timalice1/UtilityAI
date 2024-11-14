@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Core/UtilityInterface.h"
 #include "UtilityController.generated.h"
 
 class UUtilityManager;
@@ -20,7 +21,7 @@ enum ESenseType : uint8
 };
 
 UCLASS()
-class DYNAMICAI_SYSTEM_API AUtilityController : public AAIController
+class DYNAMICAI_SYSTEM_API AUtilityController : public AAIController, public IUtilityInterface
 {
     GENERATED_BODY()
 
@@ -31,11 +32,9 @@ public:
     virtual FGenericTeamId GetGenericTeamId() const override { return _teamId; };
 
 public:
-
     virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn = true) override;
 
-    virtual FVector GetFocalPointOnActor(const AActor* Actor) const override;
-
+    virtual FVector GetFocalPointOnActor(const AActor *Actor) const override;
 
 protected:
     UPROPERTY(BlueprintReadWrite, Category = "References")
@@ -52,10 +51,15 @@ protected:
     float AimHalfHeightOffset = 90.f;
 
     UPROPERTY(BlueprintReadWrite)
-    class ABaseCharacter* _agent = nullptr;
+    class ABaseCharacter *_agent = nullptr;
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "AI_Controller")
     TEnumAsByte<ESenseType> CheckSenseType(const FAIStimulus &stimulus) const;
+
+    UUtilityManager *GetUtilityManager_Implementation() override
+    {
+        return UtilityManager;
+    }
 
 private:
     TMap<TSubclassOf<class UAISense>, TEnumAsByte<ESenseType>> _senses;

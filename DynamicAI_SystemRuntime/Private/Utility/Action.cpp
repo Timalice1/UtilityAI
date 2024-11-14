@@ -1,6 +1,5 @@
 #include "Utility/Action.h"
 #include "Utility/Service.h"
-#include "Utility/Scorer.h"
 #include "Core/UtilityManager.h"
 #include "AIController.h"
 #include "Engine/CurveTable.h"
@@ -8,13 +7,18 @@
 #if WITH_EDITOR
 void UAction::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {
-    FName property = PropertyChangedEvent.GetPropertyName();
-    if (property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty())
-    {
-        Scorers[0].FirstElement = true;
-        for (int i = 1; i < Scorers.Num(); i++)
-            Scorers[i].FirstElement = false;
-    }
+
+    /*
+    @todo Add here the same but for scorers stacks
+    */
+
+    // FName property = PropertyChangedEvent.GetPropertyName();
+    // if (property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty())
+    // {
+    //     Scorers[0].FirstElement = true;
+    //     for (int i = 1; i < Scorers.Num(); i++)
+    //         Scorers[i].FirstElement = false;
+    // }
     Modify();
 }
 #endif
@@ -37,26 +41,29 @@ void UAction::Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TOb
         _pawn = Pawn;
     }
 
-    if (InConsiderations.IsEmpty() || Scorers.Num() != InConsiderations.Num())
+    if (InConsiderations.IsEmpty())
     {
         UE_LOG(UtilityManagerLog, Warning, TEXT("Can't init action [%s]"), *GetName());
         return;
     }
 
     /*Assing considerations to their scorers*/
-    for (FScorer &Scorer : Scorers)
+    for (FScorerPool &_layer : Scorers)
     {
-        TObjectPtr<UConsideration> _cons = *InConsiderations.Find(Scorer.ScorerTag);
-        if (!_cons || Scorer.GetConsiderationInstance() != nullptr)
-            continue;
-
-        if (auto CurveTable = _manager->GetCurveTableAsset())
+        for (FScorer &Scorer : _layer.GetScorers())
         {
-            FRichCurve *Curve = CurveTable->FindRichCurve(Scorer.ScorerTag.GetTagName(), FString(), false);
-            if (Curve)
+            TObjectPtr<UConsideration> _cons = *InConsiderations.Find(Scorer.ScorerTag);
+            if (!_cons || Scorer.GetConsiderationInstance() != nullptr)
+                continue;
+
+            if (auto CurveTable = _manager->GetCurveTableAsset())
             {
-                _cons->SetResponseCurve(*Curve);
-                Scorer.SetConsiderationInstance(_cons);
+                FRichCurve *Curve = CurveTable->FindRichCurve(Scorer.ScorerTag.GetTagName(), FString(), false);
+                if (Curve)
+                {
+                    _cons->SetResponseCurve(*Curve);
+                    Scorer.SetConsiderationInstance(_cons);
+                }
             }
         }
     }

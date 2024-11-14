@@ -45,7 +45,7 @@ USTRUCT(BlueprintType)
 struct FScorer
 {
     GENERATED_BODY()
-
+    
 protected:
     UPROPERTY()
     TObjectPtr<UConsideration> _considerationInstance;
@@ -54,9 +54,6 @@ public:
     UPROPERTY(VisibleInstanceOnly)
     bool FirstElement = false;
 
-    /** Make sure that actions comes in the right order
-     * Scorers with OR operator need to be on the top o action scorers array,
-     * and scorers with operator AND goes next */
     UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "!FirstElement", EditConditionHides))
     TEnumAsByte<EOperator> Operator;
 
@@ -104,4 +101,39 @@ public:
     }
 
     friend uint32 GetTypeHash(const FScorer &scorer) { return GetTypeHash(scorer.ScorerTag); }
+};
+
+USTRUCT(BlueprintType)
+struct FScorerPool
+{
+    GENERATED_BODY()
+
+    UPROPERTY(VisibleInstanceOnly)
+    bool FirstElement = false;
+
+    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "!FirstElement", EditConditionHides))
+    TEnumAsByte<EOperator> Operator;
+
+    UPROPERTY(EditDefaultsOnly)
+    TArray<FScorer> Scorers;
+
+    float GetScore() 
+    {
+        float _totalScore = Scorers[0].GetScore();
+        for (int i = 1; i < Scorers.Num(); i++)
+        {
+            float currentScore = Scorers[i].GetScore();
+
+            if (Scorers[i].Operator == OR)
+                _totalScore = FMath::Clamp(_totalScore + currentScore, 0, 1);
+            else
+                _totalScore *= currentScore;
+        }
+        return _totalScore;
+    }
+
+    TArray<FScorer> GetScorers()
+    {
+        return Scorers;
+    }
 };
