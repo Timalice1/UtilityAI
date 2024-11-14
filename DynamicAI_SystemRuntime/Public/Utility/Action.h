@@ -84,7 +84,7 @@ private:
 
     FTimerHandle _timeoutTimer;
 
-    FRichCurve ModifierCurve;
+    FRichCurve* ModifierCurve;
 
 private:
     virtual UWorld *GetWorld() const override;
@@ -147,9 +147,7 @@ protected:
     UFUNCTION(BlueprintImplementableEvent, Category = "UtilityAI|Action")
     void OnActionFinished(AAIController *Controller, APawn *Pawn);
 
-    /** Needs to be called when action is about to finish */
-    UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
-    void FinishExecute();
+    
 
 public:
     bool IsFinished = true;
@@ -178,6 +176,10 @@ public:
             _allScorers.Append(_layer.GetScorers());
         return _allScorers;
     };
+
+    /** Needs to be called when action is about to finish */
+    UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
+    void FinishExecute();
 
     FORCEINLINE virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
 };

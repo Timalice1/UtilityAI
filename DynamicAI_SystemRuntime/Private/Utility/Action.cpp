@@ -12,13 +12,15 @@ void UAction::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent
     @todo Add here the same but for scorers stacks
     */
 
-    // FName property = PropertyChangedEvent.GetPropertyName();
+    FName property = PropertyChangedEvent.GetPropertyName();
     // if (property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty())
     // {
     //     Scorers[0].FirstElement = true;
     //     for (int i = 1; i < Scorers.Num(); i++)
     //         Scorers[i].FirstElement = false;
     // }
+    if (property == GET_MEMBER_NAME_CHECKED(UAction, UtilityModifier_Curve))
+        ModifierCurve = UtilityModifier_Curve.GetRichCurve(FString(TEXT("")));
     Modify();
 }
 #endif
@@ -100,6 +102,8 @@ float UAction::EvaluateActionScore()
                 ActionScore *= currentScore;
         }
     }
+    if(ModifierCurve)
+        ActionScore = ModifierCurve->Eval(ActionScore);
     return ActionScore * ActionPriority;
 }
 
