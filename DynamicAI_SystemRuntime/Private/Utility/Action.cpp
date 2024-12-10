@@ -7,20 +7,13 @@
 #if WITH_EDITOR
 void UAction::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {
-
-    /*
-    @todo Add here the same but for scorers stacks
-    */
-
     FName property = PropertyChangedEvent.GetPropertyName();
-    // if (property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty())
-    // {
-    //     Scorers[0].FirstElement = true;
-    //     for (int i = 1; i < Scorers.Num(); i++)
-    //         Scorers[i].FirstElement = false;
-    // }
-    if (property == GET_MEMBER_NAME_CHECKED(UAction, UtilityModifier_Curve))
-        ModifierCurve = UtilityModifier_Curve.GetRichCurve(FString(TEXT("")));
+    if (property == GET_MEMBER_NAME_CHECKED(UAction, Scorers) && !Scorers.IsEmpty())
+    {
+        Scorers[0].FirstElement = true;
+        for (int i = 1; i < Scorers.Num(); i++)
+            Scorers[i].FirstElement = false;
+    }
     Modify();
 }
 #endif
@@ -45,30 +38,30 @@ void UAction::Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TOb
 
     if (InConsiderations.IsEmpty())
     {
-        UE_LOG(UtilityManagerLog, Warning, TEXT("Can't init action [%s]"), *GetName());
+        UE_LOG(UtilityManagerLog, Warning, TEXT("Can't init action [%s]: no one consideration is defined"), *GetName());
         return;
     }
 
     /*Assing considerations to their scorers*/
-    for (FScorerPool &_layer : Scorers)
+    for (FScorer &Scorer : Scorers)
     {
-        for (FScorer &Scorer : _layer.GetScorers())
-        {
-            TObjectPtr<UConsideration> _cons = *InConsiderations.Find(Scorer.ScorerTag);
-            if (!_cons || Scorer.GetConsiderationInstance() != nullptr)
-                continue;
+        TObjectPtr<UConsideration> _cons = *InConsiderations.Find(Scorer.ScorerTag);
+        if (!_cons || Scorer.GetConsiderationInstance() != nullptr)
+            continue;
 
-            if (auto CurveTable = _manager->GetCurveTableAsset())
+        if (auto CurveTable = _manager->GetCurveTableAsset())
+        {
+            FRichCurve *Curve = CurveTable->FindRichCurve(Scorer.ScorerTag.GetTagName(), FString(), false);
+            if (Curve)
             {
-                FRichCurve *Curve = CurveTable->FindRichCurve(Scorer.ScorerTag.GetTagName(), FString(), false);
-                if (Curve)
-                {
-                    _cons->SetResponseCurve(*Curve);
-                    Scorer.SetConsiderationInstance(_cons);
-                }
+                _cons->SetResponseCurve(*Curve);
+                Scorer.SetConsiderationInstance(_cons);
             }
         }
     }
+
+    if(auto _modifiersTable = _manager->GetActionModifiersCurveTable())
+        ModifierCurve = _modifiersTable->FindRichCurve(FName(GetName().LeftChop(4)), FString(), false);
 
     UE_LOG(UtilityManagerLog, Log, TEXT("Action [%s] initialized!"), *GetName());
 
@@ -97,12 +90,12 @@ float UAction::EvaluateActionScore()
             float currentScore = Scorers[i].GetScore();
 
             if (Scorers[i].Operator == OR)
-                ActionScore = FMath::Clamp(ActionScore + currentScore, 0, 1);
-            else
+                ActionScore = (ActionScore + currentScore) - (ActionScore * currentScore);
+            else if (Scorers[i].Operator == AND)
                 ActionScore *= currentScore;
         }
     }
-    if(ModifierCurve)
+    if (ModifierCurve != nullptr)
         ActionScore = ModifierCurve->Eval(ActionScore);
     return ActionScore * ActionPriority;
 }
@@ -113,10 +106,10 @@ void UAction::Execute()
     if (_controller && _pawn)
         this->ExecuteAction(_controller, _pawn);
 }
-void UAction::FinishExecute()
+void UAction::FinishExecute(EExecutionResult execResult)
 {
     IsFinished = true;
-    OnActionFinished(_controller, _pawn);
+    OnActionFinished(_controller, _pawn, execResult);
     if (Timeout > .0f)
     {
         bCanBeEvaluated = false;

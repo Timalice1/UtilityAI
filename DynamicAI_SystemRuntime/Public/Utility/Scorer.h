@@ -4,6 +4,7 @@
 #include "GameplayTags.h"
 #include "Scorer.generated.h"
 
+
 UCLASS(MinimalAPI, BlueprintType)
 class UConsideration : public UObject
 {
@@ -65,10 +66,6 @@ public:
     UPROPERTY(EditDefaultsOnly)
     FGameplayTag ScorerTag;
 
-    /** Weight of this consideration for current action */
-    UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 0.1))
-    float Weight = 1.f;
-
     FORCEINLINE virtual void SetConsiderationInstance(TObjectPtr<UConsideration> inInstance)
     {
         _considerationInstance = inInstance;
@@ -89,7 +86,6 @@ public:
         {
             float rawScore = _considerationInstance->GetRawScore();
             rawScore = Inverted ? 1 - rawScore : rawScore;
-            rawScore *= Weight;
             return rawScore;
         }
         return 0.f;
@@ -101,39 +97,4 @@ public:
     }
 
     friend uint32 GetTypeHash(const FScorer &scorer) { return GetTypeHash(scorer.ScorerTag); }
-};
-
-USTRUCT(BlueprintType)
-struct FScorerPool
-{
-    GENERATED_BODY()
-
-    UPROPERTY(VisibleInstanceOnly)
-    bool FirstElement = false;
-
-    UPROPERTY(EditDefaultsOnly, meta = (EditCondition = "!FirstElement", EditConditionHides))
-    TEnumAsByte<EOperator> Operator;
-
-    UPROPERTY(EditDefaultsOnly)
-    TArray<FScorer> Scorers;
-
-    float GetScore() 
-    {
-        float _totalScore = Scorers[0].GetScore();
-        for (int i = 1; i < Scorers.Num(); i++)
-        {
-            float currentScore = Scorers[i].GetScore();
-
-            if (Scorers[i].Operator == OR)
-                _totalScore = FMath::Clamp(_totalScore + currentScore, 0, 1);
-            else
-                _totalScore *= currentScore;
-        }
-        return _totalScore;
-    }
-
-    TArray<FScorer> GetScorers()
-    {
-        return Scorers;
-    }
 };

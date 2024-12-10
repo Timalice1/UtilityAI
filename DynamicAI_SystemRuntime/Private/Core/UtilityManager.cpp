@@ -13,13 +13,16 @@ UUtilityManager::UUtilityManager()
 
 void UUtilityManager::BeginPlay()
 {
-    for (UService *_service : Services)
-        _service->Init(this);
-
     if (IsEmpty())
     {
         UE_LOG(UtilityManagerLog, Warning, TEXT("No one action is defined"));
         return Super::BeginPlay();
+    }
+
+    for (UService *_service : Services)
+    {
+        if (_service)
+            _service->Init(this);
     }
 
     for (auto &_action : _actionsScorers)
@@ -52,6 +55,10 @@ void UUtilityManager::Activate(bool bReset)
     if (GIsEditor && !GIsPlayInEditorWorld)
         return Super::Activate(bReset);
 
+    for (UService *_service : Services)
+        if (_service)
+            _service->Activate();
+
     GetWorld()
         ->GetTimerManager()
         .SetTimer(evaluationTimer, this, &ThisClass::EvaluateActions, EvaluationInterval, true);
@@ -63,20 +70,11 @@ void UUtilityManager::Activate(bool bReset)
 void UUtilityManager::Deactivate()
 {
     GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+    AbortActiveActions();
 
     for (UService *_service : Services)
-    {
-        GetWorld()->GetTimerManager().ClearTimer(_service->tickTimer);
-        _service = nullptr;
-        _service->ConditionalBeginDestroy();
-    }
-
-    Services.Empty();
-
-    _actions.Empty();
-    _pools.Empty();
-    _activeActions.Empty();
-    _considerations.Empty();
+        if (_service)
+            _service->Deactivate();
 
     Super::Deactivate();
     UE_LOG(UtilityManagerLog, Log, TEXT("[%s]: UtilityManager deactivated"), *GetOwner()->GetName());
@@ -160,7 +158,34 @@ void UUtilityManager::EvaluateActions()
 void UUtilityManager::AbortActiveActions()
 {
     for (UAction *_action : _activeActions)
-        _action->FinishExecute();
+    {
+        _action->FinishExecute(EExecutionResult::Aborted);
+        UE_LOG(UtilityManagerLog, Log, TEXT("%s: action aborted"), *_action->GetName());
+    }
+}
+
+void UUtilityManager::AbortAction(TSubclassOf<UAction> action)
+{
+    for (UAction *_action : _activeActions)
+    {
+        if (_action->GetClass() == action)
+        {
+            _action->FinishExecute(EExecutionResult::Aborted);
+            return;
+        }
+    }
+}
+
+void UUtilityManager::AbortActionsFromPool(FName PoolName)
+{
+    FActionsPool *_pool = _pools.FindByPredicate([PoolName](const FActionsPool &p)
+                                                 { return p.PoolName == PoolName; });
+    if (_pool)
+    {
+        for (UAction *_action : _pool->GetActions())
+            if (_action && _activeActions.Contains(_action))
+                _action->FinishExecute(EExecutionResult::Aborted);
+    }
 }
 
 bool UUtilityManager::CanRunConcurent(UAction *Action) const
@@ -238,15 +263,19 @@ bool UUtilityManager::SetPoolPriority(FName PoolName, int32 Priority)
 void UUtilityManager::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {
     FName property = PropertyChangedEvent.GetPropertyName();
-    if ((property == GET_MEMBER_NAME_CHECKED(FScorer, ScorerTag) ||
-         property == GET_MEMBER_NAME_CHECKED(FActionsPool, Actions) ||
+    if (((property == GET_MEMBER_NAME_CHECKED(FActionsPool, Actions) && ScorersCurveTable != nullptr) ||
          property == GET_MEMBER_NAME_CHECKED(UUtilityManager, ScorersCurveTable)) &&
         PropertyChangedEvent.ChangeType == EPropertyChangeType::ValueSet)
-        UpdateCurveTableRows();
+        UpdateScorersCurveTable();
+
+    if (((property == GET_MEMBER_NAME_CHECKED(FActionsPool, Actions) && ActionModifiersCurveTable != nullptr) ||
+         property == GET_MEMBER_NAME_CHECKED(UUtilityManager, ActionModifiersCurveTable)) &&
+        PropertyChangedEvent.ChangeType == EPropertyChangeType::ValueSet)
+        UpdateModifiersCurveTable();
     Modify();
 }
 
-void UUtilityManager::UpdateCurveTableRows()
+void UUtilityManager::UpdateScorersCurveTable()
 {
     if (IsEmpty())
     {
@@ -273,19 +302,44 @@ void UUtilityManager::UpdateCurveTableRows()
                 /*Get a scorer tag from each scorer in action*/
                 FGameplayTag tag = scorer.ScorerTag;
                 if (tag.IsValid() && !ScorersCurveTable->FindRichCurve(tag.GetTagName(), FString(), false))
-                    CreateCurve(tag.GetTagName()); // if curve is not exist, create new curve in table
+                    CreateCurve(tag.GetTagName(), *ScorersCurveTable); // if curve is not exist, create new curve in table
             }
         }
     }
 }
 
-void UUtilityManager::CreateCurve(FName Name)
+void UUtilityManager::UpdateModifiersCurveTable()
 {
-    FRichCurve &newCurve = ScorersCurveTable->AddRichCurve(Name);
+
+    if (!IsValid(ActionModifiersCurveTable))
+    {
+        UE_LOG(UtilityManagerLog, Warning, TEXT("Property [ScorersCurveTable] is invalid!"));
+        return;
+    }
+
+    for (FActionsPool &pool : ActionsPools)
+    {
+        /*Get scorers array from each referenced action*/
+        for (const TObjectPtr<UAction> &action : pool.GetActions())
+        {
+            if (!action)
+                continue;
+            FName _actionName = FName(action->GetName().LeftChop(4));
+            if (!ActionModifiersCurveTable->FindRichCurve(_actionName, FString(), false))
+            {
+                CreateCurve(_actionName, *ActionModifiersCurveTable);
+            }
+        }
+    }
+}
+
+void UUtilityManager::CreateCurve(FName CurveName, UCurveTable &InTable)
+{
+    FRichCurve &newCurve = InTable.AddRichCurve(CurveName);
     /*Set default keys for new curve*/
     newCurve.UpdateOrAddKey(0, 0);
     newCurve.UpdateOrAddKey(1, 1);
-    ScorersCurveTable->Modify();
+    InTable.Modify();
 }
 
 void UUtilityManager::ResetConsiderations()
@@ -309,7 +363,7 @@ TObjectPtr<UAction> FActionsPool::EvaluateActions()
         //     UE_LOG(UtilityManagerLog, Warning, TEXT("[%s]: action is not finished"), *action->GetName());
         // }
         float currentScore = action->EvaluateActionScore();
-        if (currentScore > maxScore && currentScore > ScoreThresshold)
+        if ((currentScore > maxScore) && (currentScore > ScoreThresshold))
         {
             maxScore = currentScore;
             _bestAction = action;

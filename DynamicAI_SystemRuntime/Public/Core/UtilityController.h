@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIController.h"
+#include "DetourCrowdAIController.h"
 #include "Core/UtilityInterface.h"
 #include "UtilityController.generated.h"
 
@@ -21,7 +21,7 @@ enum ESenseType : uint8
 };
 
 UCLASS()
-class DYNAMICAI_SYSTEM_API AUtilityController : public AAIController, public IUtilityInterface
+class DYNAMICAI_SYSTEM_API AUtilityController : public ADetourCrowdAIController, public IUtilityInterface
 {
     GENERATED_BODY()
 
@@ -35,6 +35,9 @@ public:
     virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn = true) override;
 
     virtual FVector GetFocalPointOnActor(const AActor *Actor) const override;
+    
+    UFUNCTION()
+    virtual void BeginPlay() override;
 
 protected:
     UPROPERTY(BlueprintReadWrite, Category = "References")
@@ -42,10 +45,10 @@ protected:
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Components)
-    TObjectPtr<UUtilityManager> UtilityManager = nullptr;
+    TObjectPtr<UUtilityManager> UtilityManager;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Components)
-    TObjectPtr<UAIPerceptionComponent> AI_Perception = nullptr;
+    TObjectPtr<UAIPerceptionComponent> AI_Perception;
 
     UPROPERTY(EditDefaultsOnly, Category = Character)
     float AimHalfHeightOffset = 90.f;

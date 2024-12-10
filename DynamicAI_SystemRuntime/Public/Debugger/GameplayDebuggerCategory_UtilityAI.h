@@ -39,9 +39,11 @@ protected:
 
     void ToggleDetailView();
     void ToggleActiveActions();
-    void ShowScorers(class UAction* _action, FGameplayDebuggerCanvasContext &CanvasContext);
+    void ShowScorers(class UAction *_action, FGameplayDebuggerCanvasContext &CanvasContext);
     uint32 bShowDetails : 1;
     uint32 bShowActiveActions : 1;
+
+    float _posX;    
 };
 
 #endif

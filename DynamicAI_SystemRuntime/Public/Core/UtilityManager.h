@@ -35,6 +35,10 @@
 // ⠁⡀⠁⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣤⣿⣿⣿⣿⣿⣿⣿⣿
 // ⡿⠁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
+#if WITH_EDITOR
+DECLARE_LOG_CATEGORY_EXTERN(UtilityManagerLog, Log, All);
+#endif
+
 class UAction;
 
 USTRUCT(BlueprintType)
@@ -68,10 +72,11 @@ public:
 public:
     bool IsEmpty()
     {
+        UE_CLOG(Actions.IsEmpty(), UtilityManagerLog, Warning, TEXT("Pool [%s]: no one action is defined!"), *PoolName.ToString());
         return Actions.IsEmpty();
     }
 
-    FORCEINLINE TObjectPtr<UAction> EvaluateActions();
+    TObjectPtr<UAction> EvaluateActions();
 
     TArray<TObjectPtr<UAction>> GetActions() { return Actions; }
     TArray<TObjectPtr<UAction>> GetActions() const { return Actions; }
@@ -86,9 +91,6 @@ public:
     }
 };
 
-#if WITH_EDITOR
-DECLARE_LOG_CATEGORY_EXTERN(UtilityManagerLog, Log, All);
-#endif
 
 UCLASS(ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
 class DYNAMICAI_SYSTEM_API UUtilityManager : public UActorComponent
@@ -137,8 +139,9 @@ private:
 private:
 #if WITH_EDITOR
     virtual void PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent) override;
-    virtual void UpdateCurveTableRows();
-    virtual void CreateCurve(FName Name);
+    virtual void UpdateScorersCurveTable();
+    virtual void UpdateModifiersCurveTable();
+    virtual void CreateCurve(FName CurveName, class UCurveTable &InTable);
     virtual void ResetConsiderations();
 #endif // WITH_EDITOR
 
@@ -167,14 +170,19 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Evaluator")
     TObjectPtr<class UCurveTable> ScorersCurveTable = nullptr;
 
+    /**Curve table with utility score modifier curve for each action */
+    UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Evaluator")
+    TObjectPtr<class UCurveTable> ActionModifiersCurveTable = nullptr;
+
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "UtilityManager|Evaluator")
-    TSet<class UService *> Services;
+    TSet<class UService*> Services;
 
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Actions")
     TSet<FActionsPool> ActionsPools;
 
 public:
     virtual TObjectPtr<class UCurveTable> GetCurveTableAsset() { return ScorersCurveTable; }
+    virtual TObjectPtr<class UCurveTable> GetActionModifiersCurveTable() { return ActionModifiersCurveTable; }
 
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
     void SetScorerValue(FGameplayTag InScorerTag, float InValue = 0.f);
@@ -185,6 +193,12 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
     void AbortActiveActions();
+
+    UFUNCTION(BlueprintCallable, Category = UtilityManager)
+    void AbortAction(TSubclassOf<UAction> action);
+
+    UFUNCTION(BlueprintCallable, Category = UtilityManager)
+    void AbortActionsFromPool(FName PoolName);
 
     UFUNCTION(BlueprintCallable, Category = UtilityManager)
     bool SetPoolPriority(FName PoolName, int32 Priority);

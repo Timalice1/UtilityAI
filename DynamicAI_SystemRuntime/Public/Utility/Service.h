@@ -37,7 +37,8 @@ public: // Parent class overrides
 
     virtual void Init(class UUtilityManager *inManager);
 
-    virtual void Execute();
+    virtual void Activate();
+    virtual void Deactivate();
     
 
 protected: // Properties

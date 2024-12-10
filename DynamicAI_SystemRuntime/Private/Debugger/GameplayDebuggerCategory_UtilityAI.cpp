@@ -51,6 +51,8 @@ void FGameplayDebuggerCategory_UtilityAI::CollectData(APlayerController *OwnerPC
 
 void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, FGameplayDebuggerCanvasContext &CanvasContext)
 {
+
+    _posX = CanvasContext.DefaultX;
     /*-------
     Base info
     -------*/
@@ -79,6 +81,7 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
     ----------*/
     if (bShowActiveActions)
     {
+
         CanvasContext.Printf(TEXT("\n{green}----------------Active actions----------------"));
         for (UAction *_action : DataPack.ActiveActions)
         {
@@ -97,11 +100,13 @@ void FGameplayDebuggerCategory_UtilityAI::DrawData(APlayerController *OwnerPC, F
     CanvasContext.Printf(TEXT("\n{green}--------------------Pools----------------------"));
     for (const FActionsPool &_pool : DataPack.Pools)
     {
+        CanvasContext.CursorX = _posX;
         CanvasContext.Printf(TEXT("\t\t{magenta}[%s]:"), *_pool.PoolName.ToString());
         for (UAction *_action : _pool.GetActions())
         {
             if (_action)
             {
+                CanvasContext.CursorX = _posX;
                 CanvasContext.Printf(
                     TEXT("\t\t\t{green}[%s]: {yellow}%.4f"),
                     *_action->GetName(),
@@ -117,15 +122,23 @@ void FGameplayDebuggerCategory_UtilityAI::ShowScorers(UAction *_action, FGamepla
     if (!bShowDetails)
         return;
     int i = 0;
+
     for (FScorer &_actionScorer : _action->GetScorers())
     {
+
+        CanvasContext.CursorX = _posX;
         CanvasContext.Printf(
-            TEXT("\t\t\t{magenta}[%s%s%s]: %.5f"),
+            TEXT("\t\t\t\t{magenta}[%s%s%s]: %.5f"),
             i == 0 ? TEXT("") : *(UEnum::GetValueAsString(_actionScorer.Operator) + FString(TEXT(" "))),
             _actionScorer.Inverted ? TEXT("NOT ") : TEXT(""),
             *_actionScorer.ScorerTag.GetTagName().ToString(),
             _actionScorer.GetScore());
         ++i;
+        if(CanvasContext.CursorY > 1000){
+            _posX += 400;
+            CanvasContext.CursorY = CanvasContext.DefaultY;
+        }
+        
     }
 }
 

@@ -19,6 +19,7 @@ AUtilityController::AUtilityController()
     UtilityManager = CreateDefaultSubobject<UUtilityManager>("UtilityManagerComponent");
     AI_Perception = CreateDefaultSubobject<UAIPerceptionComponent>("AI_PerceptionComponent");
 
+
     _senses.Add(UAISense_Sight::StaticClass(), ESenseType::SightSense);
     _senses.Add(UAISense_Damage::StaticClass(), ESenseType::DamageSense);
     _senses.Add(UAISense_Hearing::StaticClass(), ESenseType::HearingSense);
@@ -26,6 +27,12 @@ AUtilityController::AUtilityController()
     _senses.Add(UAISense_Touch::StaticClass(), ESenseType::TouchSense);
     _senses.Add(UAISense_Team::StaticClass(), ESenseType::TeamSense);
     _senses.Add(UAISense_Blueprint::StaticClass(), ESenseType::BlueprintSense);
+}
+
+void AUtilityController::BeginPlay()
+{
+    Super::BeginPlay();
+    UAISystem::GetCurrentSafe(GetWorld())->bForgetStaleActors = true;
 }
 
 void AUtilityController::OnPossess(APawn *InPawn)
@@ -89,6 +96,7 @@ FVector AUtilityController::GetFocalPointOnActor(const AActor *Actor) const
     }
     return _focalPoint;
 }
+
 
 void AUtilityController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
 {

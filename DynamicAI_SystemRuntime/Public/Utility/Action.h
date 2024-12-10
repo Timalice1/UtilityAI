@@ -61,6 +61,15 @@ enum EScoreType : uint8
     // EST_Blackboard
 };
 
+UENUM(BlueprintType)
+enum EExecutionResult : uint8
+{
+    Success,
+    Aborted,
+    Failed
+};
+
+
 class AAIController;
 class APawn;
 class UService;
@@ -84,7 +93,7 @@ private:
 
     FTimerHandle _timeoutTimer;
 
-    FRichCurve* ModifierCurve;
+    FRichCurve *ModifierCurve;
 
 private:
     virtual UWorld *GetWorld() const override;
@@ -106,8 +115,8 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
     bool bCanRunConcurent = false;
 
-    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig", AdvancedDisplay,
-              meta = (EditCondition = "bCanRunConcurent == true"))
+    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig",
+              meta = (EditCondition = "bCanRunConcurent == true", EditConditionHides))
     TSet<TSubclassOf<UAction>> ConcurencyExceptions;
 
     /** Priority of this action within pool */
@@ -130,10 +139,10 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig",
               meta = (EditCondition = "ScoreType==EScoreType::EST_Evaluated",
                       EditConditionHides))
-    TArray<FScorerPool> Scorers;
+    TArray<FScorer> Scorers;
 
-    UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
-    FCurveTableRowHandle UtilityModifier_Curve;
+    // UPROPERTY(EditDefaultsOnly, Category = "ActionConfig")
+    // FCurveTableRowHandle UtilityModifier_Curve;
 
 protected:
     UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action", BlueprintPure)
@@ -145,9 +154,7 @@ protected:
 
     /** Called when action is finished or aborted */
     UFUNCTION(BlueprintImplementableEvent, Category = "UtilityAI|Action")
-    void OnActionFinished(AAIController *Controller, APawn *Pawn);
-
-    
+    void OnActionFinished(AAIController *Controller, APawn *Pawn, EExecutionResult execResult);
 
 public:
     bool IsFinished = true;
@@ -169,17 +176,15 @@ public:
                !ConcurencyExceptions.Contains(OtherAction->GetClass());
     }
 
-    /** @return all scorers tags related to this action*/
-    FORCEINLINE virtual TArray<FScorer> GetScorers() {
-        TArray<FScorer> _allScorers;
-        for(FScorerPool &_layer : Scorers)
-            _allScorers.Append(_layer.GetScorers());
-        return _allScorers;
+    /** @return all scorers related to this action*/
+    FORCEINLINE virtual TArray<FScorer> GetScorers()
+    {
+        return Scorers;
     };
 
     /** Needs to be called when action is about to finish */
     UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
-    void FinishExecute();
+    void FinishExecute(EExecutionResult execResult);
 
     FORCEINLINE virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
 };
