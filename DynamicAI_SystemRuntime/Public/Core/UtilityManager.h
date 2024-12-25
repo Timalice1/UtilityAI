@@ -46,6 +46,9 @@ struct FActionsPool
 {
     GENERATED_BODY()
 
+private:
+    TArray<TObjectPtr<UAction>> _actions;
+
 public:
     UPROPERTY(EditDefaultsOnly)
     FName PoolName = TEXT("Default");
@@ -66,8 +69,8 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Evaluator", meta = (ClampMin = 0.f, ClampMax = 1.f))
     float ScoreThresshold = .01f;
 
-    UPROPERTY(EditAnywhere, Instanced)
-    TArray<TObjectPtr<UAction>> Actions;
+    UPROPERTY(EditAnywhere)
+    TSet<TSubclassOf<UAction>> Actions;
 
 public:
     bool IsEmpty()
@@ -78,11 +81,14 @@ public:
 
     TObjectPtr<UAction> EvaluateActions();
 
-    TArray<TObjectPtr<UAction>> GetActions() { return Actions; }
-    TArray<TObjectPtr<UAction>> GetActions() const { return Actions; }
+    TArray<TObjectPtr<UAction>> GetActions() { return _actions; }
+    TArray<TObjectPtr<UAction>> GetActions() const { return _actions; }
 
-    FORCEINLINE void SetPoolPriority(int32 NewPriority) { 
-        Priority = NewPriority; 
+    void Init(UObject* outer);
+
+    FORCEINLINE void SetPoolPriority(int32 NewPriority)
+    {
+        Priority = NewPriority;
     }
 
     friend uint32 GetTypeHash(const FActionsPool &pool)
@@ -90,7 +96,6 @@ public:
         return FCrc::MemCrc32(&pool, sizeof(FActionsPool));
     }
 };
-
 
 UCLASS(ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
 class DYNAMICAI_SYSTEM_API UUtilityManager : public UActorComponent
@@ -175,7 +180,7 @@ protected:
     TObjectPtr<class UCurveTable> ActionModifiersCurveTable = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "UtilityManager|Evaluator")
-    TSet<class UService*> Services;
+    TSet<class UService *> Services;
 
     UPROPERTY(EditDefaultsOnly, Category = "UtilityManager|Actions")
     TSet<FActionsPool> ActionsPools;

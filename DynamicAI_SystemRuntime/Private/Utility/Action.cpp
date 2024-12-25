@@ -97,7 +97,8 @@ float UAction::EvaluateActionScore()
     }
     if (ModifierCurve != nullptr)
         ActionScore = ModifierCurve->Eval(ActionScore);
-    return ActionScore * ActionPriority;
+    
+    return ActionScore *= ActionPriority;
 }
 
 void UAction::Execute()
@@ -106,6 +107,7 @@ void UAction::Execute()
     if (_controller && _pawn)
         this->ExecuteAction(_controller, _pawn);
 }
+
 void UAction::FinishExecute(EExecutionResult execResult)
 {
     IsFinished = true;

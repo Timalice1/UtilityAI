@@ -22,7 +22,10 @@ void UUtilityManager::BeginPlay()
     for (UService *_service : Services)
     {
         if (_service)
+        {
             _service->Init(this);
+            _service->Activate();
+        }
     }
 
     for (auto &_action : _actionsScorers)
@@ -55,10 +58,6 @@ void UUtilityManager::Activate(bool bReset)
     if (GIsEditor && !GIsPlayInEditorWorld)
         return Super::Activate(bReset);
 
-    for (UService *_service : Services)
-        if (_service)
-            _service->Activate();
-
     GetWorld()
         ->GetTimerManager()
         .SetTimer(evaluationTimer, this, &ThisClass::EvaluateActions, EvaluationInterval, true);
@@ -86,11 +85,10 @@ void UUtilityManager::InitPools()
     /*Store all actions from pools to global pool*/
     for (FActionsPool &_pool : _pools)
     {
+        _pool.Init(this);
         for (TObjectPtr<UAction> &_action : _pool.GetActions())
-        {
-            if (_action && !_actions.Contains(_action))
+            if (!_actions.Contains(_action))
                 _actions.Add(_action);
-        }
     }
 }
 
@@ -136,8 +134,11 @@ bool UUtilityManager::IsEmpty()
 
 void UUtilityManager::EvaluateActions()
 {
-    _activeActions.RemoveAll([](UAction *_action)
-                             { return _action->IsFinished; });
+    for (UAction *_action : _activeActions)
+    {
+        if (_action->IsFinished)
+            _activeActions.Remove(_action);
+    }
 
     _pools.Sort([](const FActionsPool &p1, const FActionsPool &p2)
                 { return p1.Priority > p2.Priority; });
@@ -350,18 +351,28 @@ void UUtilityManager::ResetConsiderations()
 
 #endif // WITH_EDITOR
 
+void FActionsPool::Init(UObject* outer)
+{
+    for (TSubclassOf<UAction> &_actionClass : Actions)
+    {
+        UAction *_action = NewObject<UAction>(outer, _actionClass);
+        if (_action)
+            _actions.Add(_action);
+    }
+}
+
 TObjectPtr<UAction> FActionsPool::EvaluateActions()
 {
     UAction *_bestAction = nullptr;
     float maxScore = 0;
-    for (UAction *action : Actions)
+
+    // Actions.Sort([](const UAction &_a1, const UAction &_a2)
+    //              { return _a1.ActionPriority > _a2.ActionPriority; });
+
+    for (UAction *action : _actions)
     {
         if (!action || !action->CanBeEvaluated())
             continue;
-        // if(!action->bIsFinished)
-        // {
-        //     UE_LOG(UtilityManagerLog, Warning, TEXT("[%s]: action is not finished"), *action->GetName());
-        // }
         float currentScore = action->EvaluateActionScore();
         if ((currentScore > maxScore) && (currentScore > ScoreThresshold))
         {
