@@ -104,7 +104,7 @@ float UAction::EvaluateActionScore()
 void UAction::Execute()
 {
     IsFinished = false;
-    if (_controller && _pawn)
+    if (_controller && _pawn && !IsUnreachable())
         this->ExecuteAction(_controller, _pawn);
 }
 

@@ -40,7 +40,9 @@ void FGameplayDebuggerCategory_UtilityAI::CollectData(APlayerController *OwnerPC
 
         for (UAction *_action : manager->GetActions())
         {
-            for (FScorer &_scorer : _action->GetScorers())
+            if(!_action)
+                continue;
+            for (const FScorer &_scorer : _action->GetScorers())
             {
                 if (!DataPack.Scorers.Contains(_scorer))
                     DataPack.Scorers.Add(_scorer);

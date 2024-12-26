@@ -121,7 +121,7 @@ public:
 
     /** Priority of this action within pool */
     UPROPERTY(EditAnywhere, Category = "ActionConfig", meta = (ClampMin = 1))
-    uint32 ActionPriority = 1;
+    uint32  ActionPriority = 1;
 
     /** Time while action was closed for evalueating since last execution */
     UPROPERTY(EditDefaultsOnly, Category = "ActionConfig", meta = (ClampMin = .0f))
@@ -177,10 +177,8 @@ public:
     }
 
     /** @return all scorers related to this action*/
-    FORCEINLINE virtual TArray<FScorer> GetScorers()
-    {
-        return Scorers;
-    };
+    virtual TArray<FScorer>& GetScorers() { return Scorers; };
+    virtual const TArray<FScorer>& GetScorers() const { return Scorers; };
 
     /** Needs to be called when action is about to finish */
     UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
