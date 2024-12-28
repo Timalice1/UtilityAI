@@ -47,6 +47,7 @@ struct FActionsPool
     GENERATED_BODY()
 
 private:
+    UPROPERTY()
     TArray<TObjectPtr<UAction>> _actions;
 
 public:
@@ -84,7 +85,7 @@ public:
     TArray<TObjectPtr<UAction>> GetActions() { return _actions; }
     TArray<TObjectPtr<UAction>> GetActions() const { return _actions; }
 
-    void Init(UObject* outer);
+    void Init(UObject *outer);
 
     FORCEINLINE void SetPoolPriority(int32 NewPriority)
     {
@@ -105,14 +106,20 @@ class DYNAMICAI_SYSTEM_API UUtilityManager : public UActorComponent
     FTimerHandle evaluationTimer;
     FTimerHandle executeActionTimer;
 
+    UPROPERTY()
     TMap<FGameplayTag, TObjectPtr<UConsideration>> _considerations;
+
     TMap<UAction *,
          TMap<FGameplayTag, TObjectPtr<UConsideration>>>
         _actionsScorers;
 
+    UPROPERTY()
     TArray<FActionsPool> _pools;
+    
+    UPROPERTY()
     TArray<TObjectPtr<UAction>> _actions;
 
+    UPROPERTY()
     TArray<TObjectPtr<UAction>> _activeActions;
 
     bool bCanSetScorer = true;
@@ -155,16 +162,16 @@ public:
 
     void BeginPlay() override;
 
-    virtual TArray<FActionsPool>& GetPools() { return _pools; }
-    virtual const TArray<FActionsPool>& GetPools() const { return _pools; }
+    virtual TArray<FActionsPool> &GetPools() { return _pools; }
+    virtual const TArray<FActionsPool> &GetPools() const { return _pools; }
 
     /** @return an array of all posiible actions */
-    virtual TArray<TObjectPtr<UAction>>& GetActions() { return _actions; }
-    virtual const TArray<TObjectPtr<UAction>>& GetActions() const { return _actions; }
+    virtual TArray<TObjectPtr<UAction>> &GetActions() { return _actions; }
+    virtual const TArray<TObjectPtr<UAction>> &GetActions() const { return _actions; }
 
     /** @return an array of all currently active actions */
-    virtual TArray<TObjectPtr<UAction>>& GetActiveActions() { return _activeActions; }
-    virtual const TArray<TObjectPtr<UAction>>& GetActiveActions() const { return _activeActions; }
+    virtual TArray<TObjectPtr<UAction>> &GetActiveActions() { return _activeActions; }
+    virtual const TArray<TObjectPtr<UAction>> &GetActiveActions() const { return _activeActions; }
 
 protected:
     /** How often actions utilities needs to be updated */

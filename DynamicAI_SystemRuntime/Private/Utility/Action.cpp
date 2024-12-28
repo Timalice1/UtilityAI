@@ -60,7 +60,7 @@ void UAction::Init(TObjectPtr<UUtilityManager> InManager, TMap<FGameplayTag, TOb
         }
     }
 
-    if(auto _modifiersTable = _manager->GetActionModifiersCurveTable())
+    if (auto _modifiersTable = _manager->GetActionModifiersCurveTable())
         ModifierCurve = _modifiersTable->FindRichCurve(FName(GetName().LeftChop(4)), FString(), false);
 
     UE_LOG(UtilityManagerLog, Log, TEXT("Action [%s] initialized!"), *GetName());
@@ -97,7 +97,7 @@ float UAction::EvaluateActionScore()
     }
     if (ModifierCurve != nullptr)
         ActionScore = ModifierCurve->Eval(ActionScore);
-    
+
     return ActionScore *= ActionPriority;
 }
 
@@ -112,11 +112,9 @@ void UAction::FinishExecute(EExecutionResult execResult)
 {
     IsFinished = true;
     OnActionFinished(_controller, _pawn, execResult);
-    if (Timeout > .0f)
-    {
-        bCanBeEvaluated = false;
-        GetWorld()->GetTimerManager().SetTimer(_timeoutTimer, this, &UAction::ResetTimeout, Timeout);
-    }
+
+    bCanBeEvaluated = false;
+    GetWorld()->GetTimerManager().SetTimer(_timeoutTimer, this, &ThisClass::ResetTimeout, Timeout);
 }
 
 void UAction::ResetTimeout()

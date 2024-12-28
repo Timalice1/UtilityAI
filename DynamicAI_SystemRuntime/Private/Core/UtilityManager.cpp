@@ -230,7 +230,8 @@ void UUtilityManager::SetScorerValue(FGameplayTag InScorerTag, float InValue)
         return;
 
     TObjectPtr<UConsideration> _cons = *_considerations.Find(InScorerTag);
-    _cons->SetValue(InValue);
+    if(IsValid(_cons) && _cons->GetName() != FString("None"))
+        _cons->SetValue(InValue);
 }
 
 void UUtilityManager::ResetScorers(FGameplayTagContainer InScorersTags)
@@ -351,7 +352,7 @@ void UUtilityManager::ResetConsiderations()
 
 #endif // WITH_EDITOR
 
-void FActionsPool::Init(UObject* outer)
+void FActionsPool::Init(UObject *outer)
 {
     for (TSubclassOf<UAction> &_actionClass : Actions)
     {
@@ -363,21 +364,24 @@ void FActionsPool::Init(UObject* outer)
 
 TObjectPtr<UAction> FActionsPool::EvaluateActions()
 {
-    UAction *_bestAction = nullptr;
+    TObjectPtr<UAction> _bestAction = nullptr;
     float maxScore = 0;
 
-    // Actions.Sort([](const UAction &_a1, const UAction &_a2)
-    //              { return _a1.ActionPriority > _a2.ActionPriority; });
-
-    for (UAction *action : _actions)
+    for (TObjectPtr<UAction> &action : _actions)
     {
-        if (!action || !action->CanBeEvaluated())
-            continue;
-        float currentScore = action->EvaluateActionScore();
-        if ((currentScore > maxScore) && (currentScore > ScoreThresshold))
+        if (IsValid(action) && action->CanBeEvaluated())
         {
-            maxScore = currentScore;
-            _bestAction = action;
+            GEngine->AddOnScreenDebugMessage(0, 1, FColor::Red, 
+                FString::Printf(TEXT("Action : %s - can be evaluated: %s"),                                                                                                                                                                                                                                                                                                                                                                                                             
+                *action->GetName(), 
+                action->CanBeEvaluated() ? *FString("True") : *FString("False")));
+
+            float currentScore = action->EvaluateActionScore();
+            if ((currentScore > maxScore) && (currentScore > ScoreThresshold))
+            {
+                maxScore = currentScore;
+                _bestAction = action;
+            }
         }
     }
     return _bestAction;

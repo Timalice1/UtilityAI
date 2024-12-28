@@ -30,6 +30,7 @@ protected:
 
         TArray<UAction *> ActiveActions;
         TArray<struct FActionsPool> Pools;
+        
         TArray<struct FScorer> Scorers;
 
         void Serialize(FArchive &ar);

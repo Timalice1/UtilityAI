@@ -184,5 +184,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UtilityAI|Action")
     void FinishExecute(EExecutionResult execResult);
 
-    FORCEINLINE virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
+    UFUNCTION()
+    virtual bool CanBeEvaluated() const { return bCanBeEvaluated && IsFinished; };
 };
