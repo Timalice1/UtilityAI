@@ -82,8 +82,9 @@ public:
 
     TObjectPtr<UAction> EvaluateActions();
 
-    TArray<TObjectPtr<UAction>> GetActions() { return _actions; }
-    TArray<TObjectPtr<UAction>> GetActions() const { return _actions; }
+    TArray<TObjectPtr<UAction>>& GetActions() { return _actions; }
+    const TArray<TObjectPtr<UAction>>& GetActions() const { return _actions; }
+    TArray<TSubclassOf<UAction>> GetActionClasses() { return Actions.Array(); }
 
     void Init(UObject *outer);
 

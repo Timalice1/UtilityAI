@@ -322,11 +322,11 @@ void UUtilityManager::UpdateModifiersCurveTable()
     for (FActionsPool &pool : ActionsPools)
     {
         /*Get scorers array from each referenced action*/
-        for (const TObjectPtr<UAction> &action : pool.GetActions())
+        for (TSubclassOf<UAction> &action : pool.GetActionClasses())
         {
             if (!action)
                 continue;
-            FName _actionName = FName(action->GetName().LeftChop(4));
+            FName _actionName = FName(action->GetName().LeftChop(2));
             if (!ActionModifiersCurveTable->FindRichCurve(_actionName, FString(), false))
             {
                 CreateCurve(_actionName, *ActionModifiersCurveTable);
